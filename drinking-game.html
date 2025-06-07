@@ -69,10 +69,12 @@
         position: absolute;
         border-radius: 0.75rem;
         pointer-events: none; /* 只有第一张卡片可以点击 */
+        overflow: hidden; /* 防止内容溢出 */
       }
 
       .category-selector.active {
         pointer-events: auto; /* 激活的卡片可以点击 */
+        z-index: 100 !important; /* 确保激活卡片在最上层 */
       }
 
       #topic-card {
@@ -82,6 +84,7 @@
           0px 4px 12px rgba(0, 0, 0, 0.25);
         touch-action: pan-x;
         transition: transform 0.3s ease;
+        overflow: hidden; /* 防止卡片内容溢出 */
       }
 
       #category-selectors-container {
@@ -93,6 +96,7 @@
         display: flex;
         justify-content: center;
         align-items: flex-start;
+        overflow: hidden; /* 防止标签溢出容器 */
       }
 
       .back-button {
@@ -180,6 +184,11 @@
       .card-swiping {
         transition: none !important;
       }
+
+      /* 确保非激活卡片不会显示在激活卡片前面 */
+      .category-selector:not(.active) {
+        z-index: 10 !important;
+      }
     </style>
   </head>
   <body class="bg-[#151515] text-white">
@@ -189,6 +198,7 @@
         class="w-full h-[450px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
       >
         <div id="category-selectors-container">
+          <!-- 按照从前往后的顺序：清汤 → 微辣 → 加麻加辣 → 盲盒 -->
           <div
             data-category-id="mildmode"
             class="category-selector active w-[316px] h-[100px]"
@@ -337,8 +347,10 @@
       );
       const swipeHint = document.getElementById('swipe-hint');
 
-      // 按顺序排列的分类数组
+      // 正确的从前往后顺序：清汤 → 微辣 → 加麻加辣 → 盲盒
       const categoryOrder = ['mildmode', 'ontheedge', 'intense', 'surprise'];
+      
+      // 视觉堆叠顺序（从后往前）：盲盒 → 加麻加辣 → 微辣 → 清汤（最前面）
       const categoryVisualOrder = ['surprise', 'intense', 'ontheedge', 'mildmode'];
 
       const initialTabPositions = {
@@ -384,8 +396,10 @@
         let newIndex;
         
         if (direction === 'next') {
+          // 向前：清汤 → 微辣 → 加麻加辣 → 盲盒 → 清汤
           newIndex = (currentIndex + 1) % categoryOrder.length;
         } else {
+          // 向后：盲盒 → 加麻加辣 → 微辣 → 清汤 → 盲盒
           newIndex = (currentIndex - 1 + categoryOrder.length) % categoryOrder.length;
         }
         
@@ -418,13 +432,14 @@
           isDragging = true;
           e.preventDefault();
           
-          // 只有激活的卡片跟随手指移动
+          // 只有激活的卡片跟随手指移动，限制移动范围防止穿模
           const activeSelector = document.querySelector('.category-selector.active');
           if (activeSelector) {
             activeSelector.classList.add('card-swiping');
-            const moveDistance = Math.min(Math.abs(diffX), 100);
+            const moveDistance = Math.min(Math.abs(diffX), 80); // 减少移动距离
             const direction = diffX > 0 ? 1 : -1;
-            activeSelector.style.transform = `translateX(${direction * moveDistance * 0.3}px) rotate(${direction * moveDistance * 0.1}deg) translateY(0px) scale(1)`;
+            const rotation = Math.min(moveDistance * 0.05, 3); // 减少旋转角度
+            activeSelector.style.transform = `translateX(${direction * moveDistance * 0.2}px) rotate(${direction * rotation}deg) translateY(0px) scale(1)`;
           }
         }
       }, { passive: false });
@@ -450,10 +465,10 @@
           
           let nextCategory;
           if (diffX > 0) {
-            // 向左滑动 - 下一个分类
+            // 向左滑动 - 下一个分类（从前往后）
             nextCategory = getNextCategory('next');
           } else {
-            // 向右滑动 - 上一个分类
+            // 向右滑动 - 上一个分类（从后往前）
             nextCategory = getNextCategory('prev');
           }
           
@@ -494,13 +509,14 @@
           isMouseDragging = true;
           e.preventDefault();
           
-          // 只有激活的卡片跟随鼠标移动
+          // 只有激活的卡片跟随鼠标移动，限制移动范围
           const activeSelector = document.querySelector('.category-selector.active');
           if (activeSelector) {
             activeSelector.classList.add('card-swiping');
-            const moveDistance = Math.min(Math.abs(diffX), 100);
+            const moveDistance = Math.min(Math.abs(diffX), 80);
             const direction = diffX > 0 ? 1 : -1;
-            activeSelector.style.transform = `translateX(${direction * moveDistance * 0.3}px) rotate(${direction * moveDistance * 0.1}deg) translateY(0px) scale(1)`;
+            const rotation = Math.min(moveDistance * 0.05, 3);
+            activeSelector.style.transform = `translateX(${direction * moveDistance * 0.2}px) rotate(${direction * rotation}deg) translateY(0px) scale(1)`;
           }
         }
       });
@@ -607,23 +623,24 @@
         if (activeSelector) {
           activeSelector.classList.add('active');
           activeSelector.style.transform = 'translateY(0px) scale(1)';
-          activeSelector.style.zIndex = 50;
+          activeSelector.style.zIndex = 100; // 确保激活卡片在最上层
           activeSelector.style.opacity = 1;
           activeSelector.style.boxShadow = 'none';
         }
 
+        // 设置非激活卡片的层级，确保它们在激活卡片下方
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -30;
-            const scaleFactor = 0.1;
-            const opacityFactor = 0.1;
+            const translateYFactor = -25; // 减少间距防止穿模
+            const scaleFactor = 0.08; // 减少缩放差异
+            const opacityFactor = 0.15; // 增加透明度差异
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
-            selector.style.zIndex = 40 - depth * 10;
-            selector.style.opacity = Math.max(0, 1 - depth * opacityFactor);
+            selector.style.zIndex = 50 - depth * 10; // 确保都在激活卡片下方
+            selector.style.opacity = Math.max(0.2, 1 - depth * opacityFactor);
             selector.style.boxShadow = 'none';
           }
         });
