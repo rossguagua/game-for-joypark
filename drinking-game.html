@@ -13,8 +13,8 @@
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh;
-        padding-top: 80px; /* 减少顶部padding */
-        padding-bottom: 100px; /* 增加底部padding为返回键留空间 */
+        padding-top: 60px; /* 进一步减少顶部padding，往上移动 */
+        padding-bottom: 100px; /* 保持底部padding为返回键留空间 */
         overflow-x: hidden;
       }
 
@@ -77,7 +77,7 @@
       #topic-card {
         /* This is the main active card area */
         position: relative;
-        padding-top: 70px; /* 减少顶部padding */
+        padding-top: 80px; /* 增加顶部padding为标签留出更多空间 */
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
           0px 4px 12px rgba(0, 0, 0, 0.25); /* Shadow only on the main card */
         touch-action: pan-x;
@@ -89,7 +89,7 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 70px; /* 减少高度 */
+        height: 80px; /* 增加高度为标签留出更多空间 */
         display: flex;
         justify-content: center;
         align-items: flex-start;
@@ -162,7 +162,7 @@
         <div id="category-selectors-container">
           <div
             data-category-id="surprise"
-            class="category-selector w-[264px] h-[90px]"
+            class="category-selector w-[264px] h-[100px]"
             style="background-color: #ffc9dc"
           >
             <div
@@ -178,7 +178,7 @@
           </div>
           <div
             data-category-id="intense"
-            class="category-selector w-[280px] h-[90px]"
+            class="category-selector w-[280px] h-[100px]"
             style="background-color: #b8b4ff"
           >
             <div
@@ -194,7 +194,7 @@
           </div>
           <div
             data-category-id="ontheedge"
-            class="category-selector w-[296px] h-[90px]"
+            class="category-selector w-[296px] h-[100px]"
             style="background-color: #a0e7e5"
           >
             <div
@@ -210,7 +210,7 @@
           </div>
           <div
             data-category-id="mildmode"
-            class="category-selector w-[316px] h-[90px]"
+            class="category-selector w-[316px] h-[100px]"
             style="background-color: #c8fd0b"
           >
             <div
@@ -457,19 +457,19 @@
           activeSelector.style.boxShadow = 'none';
         }
 
-        // 非激活卡片的堆叠样式 - 进一步调整间距
+        // 非激活卡片的堆叠样式 - 增加间距让所有卡片都可见
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -15; // 进一步减少间距，从-20改为-15
-            const scaleFactor = 0.06; // 进一步减少缩放，从0.08改为0.06
-            const opacityFactor = 0.15; // 调整透明度
+            const translateYFactor = -25; // 增加间距，从-15改为-25
+            const scaleFactor = 0.05; // 减少缩放，从0.06改为0.05
+            const opacityFactor = 0.12; // 调整透明度
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
             selector.style.zIndex = 40 - depth * 10;
-            selector.style.opacity = Math.max(0.4, 1 - depth * opacityFactor); // 最小透明度提高到0.4
+            selector.style.opacity = Math.max(0.5, 1 - depth * opacityFactor); // 最小透明度提高到0.5
             selector.style.boxShadow = 'none';
           }
         });
