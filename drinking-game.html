@@ -509,19 +509,19 @@
           activeSelector.style.boxShadow = 'none';
         }
 
-        // 非激活卡片的堆叠样式
+        // 非激活卡片的堆叠样式 - 调整间距
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -30;
-            const scaleFactor = 0.1;
-            const opacityFactor = 0.1;
+            const translateYFactor = -20; // 减少间距，从-30改为-20
+            const scaleFactor = 0.08; // 减少缩放，从0.1改为0.08
+            const opacityFactor = 0.12; // 稍微调整透明度，从0.1改为0.12
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
             selector.style.zIndex = 40 - depth * 10;
-            selector.style.opacity = Math.max(0, 1 - depth * opacityFactor);
+            selector.style.opacity = Math.max(0.3, 1 - depth * opacityFactor); // 最小透明度提高到0.3
             selector.style.boxShadow = 'none';
           }
         });
