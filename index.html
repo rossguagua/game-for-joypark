@@ -10,6 +10,8 @@
             font-family: 'Inter', sans-serif;
             background-color: #151515;
             overflow-x: hidden;
+            margin: 0;
+            padding: 0;
         }
         
         .status-bar {
@@ -38,29 +40,24 @@
             transform: translateY(-2px);
         }
         
-        .scroll-container {
-            padding-top: 200px;
+        .main-container {
+            padding-top: 48px; /* Only status bar height */
             padding-bottom: 40px;
             min-height: 100vh;
         }
         
-        .logo-container {
-            position: fixed;
-            top: 48px;
-            left: 0;
-            right: 0;
-            background: #151515;
-            z-index: 90;
-            height: 152px;
+        .logo-section {
+            padding: 32px 24px;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #151515;
         }
         
         .game-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 20px;
+            gap: 16px;
             padding: 0 24px;
             max-width: 390px;
             margin: 0 auto;
@@ -68,7 +65,7 @@
         
         .game-card-content {
             width: 100%;
-            height: 200px;
+            height: 240px; /* Increased height for better image display */
             border-radius: 16px;
             position: relative;
             display: flex;
@@ -95,8 +92,8 @@
         }
         
         .logo-image {
-            max-width: 120px;
-            max-height: 80px;
+            max-width: 140px;
+            max-height: 100px;
             object-fit: contain;
         }
         
@@ -142,6 +139,7 @@
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
+            z-index: 10;
         }
 
         /* Text overlay for better readability on images */
@@ -153,6 +151,11 @@
             background: linear-gradient(transparent, rgba(0,0,0,0.7));
             padding: 16px;
             border-radius: 0 0 16px 16px;
+        }
+
+        /* Ensure smooth scrolling */
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
@@ -184,13 +187,14 @@
         </div>
     </div>
 
-    <!-- Logo -->
-    <div class="logo-container">
-        <img src="images/jiubao-park-logo.png/image.png" alt="酒宝公园" class="logo-image">
-    </div>
+    <!-- Main Content Container -->
+    <div class="main-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="images/jiubao-park-logo.png/image.png" alt="酒宝公园" class="logo-image">
+        </div>
 
-    <!-- Main Content -->
-    <div class="scroll-container">
+        <!-- Game Grid -->
         <div class="game-grid">
             <!-- 得吃大逃杀 -->
             <div class="game-card coming-soon" onclick="openGame('battle-royale')">
