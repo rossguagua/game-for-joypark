@@ -1,357 +1,283 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>喝酒话题游戏</title>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒宝公园 - 游戏库</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      body {
-        font-family: 'Inter', sans-serif;
-        background-color: #151515;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start; /* Align to top to see stacking from top */
-        min-height: 100vh;
-        padding-top: 100px; /* Increased padding to see top of stack */
-        overflow-x: hidden;
-      }
-
-      /* Removed shadow classes: .shadow-stack-active, .shadow-stack-inactive, .shadow-stack-deep-inactive */
-
-      .topic-fade-out {
-        animation: fadeOutTopic 0.3s ease-in-out forwards;
-      }
-      .topic-fade-in {
-        animation: fadeInTopic 0.3s ease-in-out forwards;
-      }
-
-      @keyframes fadeInTopic {
-        from {
-          opacity: 0;
-          transform: translateY(15px);
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #151515;
+            overflow-x: hidden;
         }
-        to {
-          opacity: 1;
-          transform: translateY(0);
+        
+        .status-bar {
+            background: #151515;
+            height: 48px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
         }
-      }
-      @keyframes fadeOutTopic {
-        from {
-          opacity: 1;
-          transform: translateY(0);
+        
+        .game-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border-radius: 16px;
+            overflow: hidden;
         }
-        to {
-          opacity: 0;
-          transform: translateY(-15px);
+        
+        .game-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
         }
-      }
-
-      .font-mi-sans {
-        /* Placeholder */
-      }
-      .font-rajdhani {
-        /* Placeholder */
-      }
-
-      .category-text-part {
-        /* For the text inside the small colored tab part */
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        line-height: 1.2;
-        height: 100%; /* Ensure it fills the small tab part */
-      }
-
-      .category-selector {
-        /* These are the individual clickable tabs */
-        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55),
-          opacity 0.4s ease-out; /* Removed box-shadow transition */
-        transform-origin: center top;
-        position: absolute;
-        border-radius: 0.75rem; /* 12px */
-        /* box-shadow is now removed by default */
-      }
-
-      #topic-card {
-        /* This is the main active card area */
-        position: relative;
-        padding-top: 80px;
-        box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
-          0px 4px 12px rgba(0, 0, 0, 0.25); /* Shadow only on the main card */
-      }
-
-      #category-selectors-container {
-        /* Container for all category tabs */
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        height: 80px;
-        display: flex;
-        justify-content: center;
-        align-items: flex-start;
-      }
+        
+        .game-card:active {
+            transform: translateY(-2px);
+        }
+        
+        .scroll-container {
+            padding-top: 200px;
+            padding-bottom: 40px;
+            min-height: 100vh;
+        }
+        
+        .logo-container {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            right: 0;
+            background: #151515;
+            z-index: 90;
+            height: 152px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 0 24px;
+            max-width: 390px;
+            margin: 0 auto;
+        }
+        
+        .game-card-content {
+            width: 100%;
+            height: 200px;
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 16px;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .game-title {
+            font-size: 18px;
+            font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .game-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .logo-text {
+            color: white;
+            font-size: 24px;
+            font-weight: 900;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        
+        /* Game specific backgrounds */
+        .game-1 {
+            background: linear-gradient(135deg, #ff4757 0%, #ff3742 50%, #c44569 100%);
+        }
+        
+        .game-2 {
+            background: linear-gradient(135deg, #5352ed 0%, #3742fa 50%, #2f3542 100%);
+        }
+        
+        .game-3 {
+            background: linear-gradient(135deg, #70a1ff 0%, #5352ed 50%, #3742fa 100%);
+        }
+        
+        .game-4 {
+            background: linear-gradient(135deg, #2f3542 0%, #57606f 50%, #747d8c 100%);
+        }
+        
+        .game-5 {
+            background: linear-gradient(135deg, #ff9ff3 0%, #f368e0 50%, #ff3838 100%);
+        }
+        
+        .game-6 {
+            background: linear-gradient(135deg, #ffa502 0%, #ff6348 50%, #ff4757 100%);
+        }
+        
+        .coming-soon {
+            opacity: 0.7;
+            position: relative;
+        }
+        
+        .coming-soon::after {
+            content: "即将推出";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+        }
     </style>
-  </head>
-  <body class="bg-[#151515] text-white">
-    <div class="container w-full max-w-[350px] p-4 flex flex-col items-center">
-      <div
-        id="topic-card"
-        class="w-full h-[500px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
-      >
-        <div id="category-selectors-container">
-          <div
-            data-category-id="surprise"
-            class="category-selector w-[264px] h-[100px]"
-            style="background-color: #ffc9dc"
-          >
-            <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
-              style="background-color: #f93c7e; color: #2df92a"
-            >
-              <div class="category-text-part">
-                <span class="text-xs font-medium font-mi-sans block"
-                  >盲盒 Surprise Me</span
-                >
-              </div>
+</head>
+<body class="bg-[#151515] text-white">
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="flex items-center justify-between px-6 h-full">
+            <div class="text-white font-medium text-sm">9:41</div>
+            <div class="flex items-center space-x-2">
+                <!-- Signal bars -->
+                <div class="flex space-x-1">
+                    <div class="w-1 h-2 bg-white rounded-full"></div>
+                    <div class="w-1 h-3 bg-white rounded-full"></div>
+                    <div class="w-1 h-4 bg-white rounded-full"></div>
+                    <div class="w-1 h-4 bg-white rounded-full"></div>
+                </div>
+                <!-- WiFi -->
+                <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+                    <path d="M1.5 4.5C3.5 2.5 6 1.5 7.5 1.5C9 1.5 11.5 2.5 13.5 4.5M3.5 6.5C4.5 5.5 6 5 7.5 5C9 5 10.5 5.5 11.5 6.5M6 8.5C6.5 8 7 7.5 7.5 7.5C8 7.5 8.5 8 9 8.5" stroke="white" stroke-width="1" stroke-linecap="round"/>
+                </svg>
+                <!-- Battery -->
+                <div class="flex items-center">
+                    <div class="w-6 h-3 border border-white border-opacity-60 rounded-sm">
+                        <div class="w-4 h-1.5 bg-white rounded-sm m-0.5"></div>
+                    </div>
+                    <div class="w-0.5 h-1 bg-white bg-opacity-60 ml-0.5 rounded-full"></div>
+                </div>
             </div>
-          </div>
-          <div
-            data-category-id="intense"
-            class="category-selector w-[280px] h-[100px]"
-            style="background-color: #b8b4ff"
-          >
-            <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
-              style="background-color: #342af6; color: #ff2470"
-            >
-              <div class="category-text-part">
-                <span class="text-xs font-medium font-mi-sans block"
-                  >加麻加辣 Intense</span
-                >
-              </div>
-            </div>
-          </div>
-          <div
-            data-category-id="ontheedge"
-            class="category-selector w-[296px] h-[100px]"
-            style="background-color: #a0e7e5"
-          >
-            <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
-              style="background-color: #ffc9dc; color: #560ee6"
-            >
-              <div class="category-text-part">
-                <span class="text-xs font-medium font-mi-sans block"
-                  >微辣 On the Edge</span
-                >
-              </div>
-            </div>
-          </div>
-          <div
-            data-category-id="mildmode"
-            class="category-selector w-[316px] h-[100px]"
-            style="background-color: #c8fd0b"
-          >
-            <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
-              style="background-color: #2df92a; color: black"
-            >
-              <div class="category-text-part">
-                <span class="text-xs font-medium font-mi-sans block"
-                  >清汤 Mild Mode</span
-                >
-              </div>
-            </div>
-          </div>
         </div>
+    </div>
 
-        <div
-          id="topic-text"
-          class="text-3xl md:text-4xl font-extrabold uppercase text-center leading-tight flex items-center justify-center h-full px-4 mt-[20px] mb-auto"
-          style="letter-spacing: 0.02em"
-        >
-          点击卡片开始
+    <!-- Logo -->
+    <div class="logo-container">
+        <div class="logo-text">
+            <div style="font-size: 28px; font-weight: 900; margin-bottom: 4px;">酒宝</div>
+            <div style="font-size: 28px; font-weight: 900;">公园</div>
         </div>
+    </div>
 
-        <button
-          id="refresh-button"
-          aria-label="下一个话题"
-          class="bg-black rounded-full p-3 w-16 h-16 flex items-center justify-center text-white shadow-lg mb-6 z-50 hover:bg-gray-800 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-8 h-8"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-            />
-          </svg>
-        </button>
-      </div>
+    <!-- Main Content -->
+    <div class="scroll-container">
+        <div class="game-grid">
+            <!-- 得吃大逃杀 -->
+            <div class="game-card coming-soon" onclick="openGame('battle-royale')">
+                <div class="game-card-content game-1">
+                    <div>
+                        <div class="game-title">得</div>
+                        <div class="game-title">吃</div>
+                        <div class="game-title">大逃杀</div>
+                    </div>
+                    <div class="game-subtitle">生存竞技游戏</div>
+                </div>
+            </div>
+
+            <!-- 一本吻痕 -->
+            <div class="game-card coming-soon" onclick="openGame('kiss-marks')">
+                <div class="game-card-content game-2">
+                    <div>
+                        <div class="game-title">一本吻痕</div>
+                    </div>
+                    <div class="game-subtitle">浪漫互动</div>
+                </div>
+            </div>
+
+            <!-- 喝酒话题游戏 (Your existing game) -->
+            <div class="game-card" onclick="openGame('drinking-topics')">
+                <div class="game-card-content game-3">
+                    <div>
+                        <div class="game-title">喝酒话题</div>
+                    </div>
+                    <div class="game-subtitle">聊天破冰神器</div>
+                </div>
+            </div>
+
+            <!-- 酒宝生智 -->
+            <div class="game-card coming-soon" onclick="openGame('wisdom')">
+                <div class="game-card-content game-4">
+                    <div>
+                        <div class="game-title">酒宝生智</div>
+                    </div>
+                    <div class="game-subtitle">智力挑战</div>
+                </div>
+            </div>
+
+            <!-- 纯爱大作战 -->
+            <div class="game-card coming-soon" onclick="openGame('love-battle')">
+                <div class="game-card-content game-5">
+                    <div>
+                        <div class="game-title">纯爱大作战</div>
+                    </div>
+                    <div class="game-subtitle">恋爱模拟</div>
+                </div>
+            </div>
+
+            <!-- 光 -->
+            <div class="game-card coming-soon" onclick="openGame('light')">
+                <div class="game-card-content game-6">
+                    <div>
+                        <div class="game-title">光</div>
+                    </div>
+                    <div class="game-subtitle">冒险解谜</div>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
-      let topicsData = {}; // 初始化为一个空对象
+        function openGame(gameId) {
+            switch(gameId) {
+                case 'drinking-topics':
+                    // Navigate to your existing drinking topics game
+                    window.location.href = 'drinking-game.html';
+                    break;
+                case 'battle-royale':
+                    // For now, show coming soon message
+                    alert('得吃大逃杀即将推出，敬请期待！');
+                    break;
+                default:
+                    // Show coming soon message for other games
+                    alert('该游戏即将推出，敬请期待！');
+            }
+        }
 
-      // 从 JSON 文件中获取话题数据
-      fetch('topics.json')
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          topicsData = data; // 将获取到的数据赋值给 topicsData
-          // 数据加载完成后，再进行初始化
-          setActiveCategory(currentCategoryId);
-        })
-        .catch((error) => {
-          console.error('Error fetching topics:', error);
-          topicTextElement.textContent = '加载话题失败，请稍后再试。';
+        // Add smooth scrolling behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add touch feedback for mobile
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach(card => {
+                card.addEventListener('touchstart', function() {
+                    this.style.transform = 'translateY(-2px) scale(0.98)';
+                });
+                
+                card.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
         });
-
-      let currentCategoryId = 'mildmode';
-      let lastTopicIndex = -1;
-
-      const topicCardElement = document.getElementById('topic-card');
-      const topicTextElement = document.getElementById('topic-text');
-      const refreshButton = document.getElementById('refresh-button');
-      const categorySelectors = Array.from(
-        document.querySelectorAll('.category-selector')
-      );
-
-      const categoryVisualOrder = ['surprise', 'intense', 'ontheedge', 'mildmode'];
-
-      const initialTabPositions = {
-        surprise: { left: 'calc(50% - 132px)' },
-        intense: { left: 'calc(50% - 140px)' },
-        ontheedge: { left: 'calc(50% - 148px)' },
-        mildmode: { left: 'calc(50% - 158px)' },
-      };
-
-      categorySelectors.forEach((sel) => {
-        const id = sel.dataset.categoryId;
-        sel.style.left = initialTabPositions[id].left;
-      });
-
-      function getRandomTopic(questions) {
-        if (!questions || questions.length === 0) return '这个类型暂时没有话题哦！';
-        if (questions.length === 1) return questions[0];
-        let randomIndex;
-        do {
-          randomIndex = Math.floor(Math.random() * questions.length);
-        } while (randomIndex === lastTopicIndex && questions.length > 1);
-        lastTopicIndex = randomIndex;
-        return questions[randomIndex];
-      }
-
-      function displayNewTopic() {
-        if (!topicsData[currentCategoryId]) {
-          topicTextElement.textContent = '话题数据未加载或类型不存在。';
-          return;
-        }
-        const category = topicsData[currentCategoryId];
-        const newTopic = getRandomTopic(category.questions);
-        topicTextElement.classList.remove('topic-fade-in');
-        topicTextElement.classList.add('topic-fade-out');
-        setTimeout(() => {
-          topicTextElement.textContent = newTopic;
-          topicTextElement.classList.remove('topic-fade-out');
-          topicTextElement.classList.add('topic-fade-in');
-        }, 300);
-      }
-
-      function updateTopicCardUnifiedStyle() {
-        if (!topicsData[currentCategoryId]) {
-          console.warn('Current category data is not available.');
-          return;
-        }
-        const activeCategoryData = topicsData[currentCategoryId];
-        for (const key in topicsData) {
-          if (topicsData.hasOwnProperty(key)) {
-            topicCardElement.classList.remove(
-              topicsData[key].mainCardColor,
-              topicsData[key].mainCardTextColor
-            );
-          }
-        }
-        topicCardElement.classList.add(
-          activeCategoryData.mainCardColor,
-          activeCategoryData.mainCardTextColor
-        );
-      }
-
-      function setActiveCategory(newCategoryId) {
-        currentCategoryId = newCategoryId;
-        lastTopicIndex = -1; // 切换分类时重置 lastTopicIndex
-        updateTopicCardUnifiedStyle();
-        displayNewTopic();
-
-        const activeSelector = categorySelectors.find(
-          (s) => s.dataset.categoryId === newCategoryId
-        );
-
-        const inactiveSelectorsOrdered = categoryVisualOrder
-          .filter((id) => id !== newCategoryId)
-          .map((id) => categorySelectors.find((s) => s.dataset.categoryId === id));
-
-        // 激活卡片的样式
-        if (activeSelector) {
-          activeSelector.style.transform = 'translateY(0px) scale(1)';
-          activeSelector.style.zIndex = 50;
-          activeSelector.style.opacity = 1;
-          activeSelector.style.boxShadow = 'none'; // 移除激活标签的阴影
-        }
-
-        // 非激活卡片的堆叠样式
-        inactiveSelectorsOrdered.forEach((selector, index) => {
-          if (selector) {
-            const depth = index + 1;
-            // 可修改的堆叠效果变量：
-            const translateYFactor = -30; // 负值越大，间距越大
-            const scaleFactor = 0.1; // 值越大，每层收缩越多
-            const opacityFactor = 0.1; // 值越大，每层透明度降低越多
-
-            selector.style.transform = `translateY(${
-              depth * translateYFactor
-            }px) scale(${1 - depth * scaleFactor})`;
-            selector.style.zIndex = 40 - depth * 10;
-            selector.style.opacity = Math.max(0, 1 - depth * opacityFactor);
-            selector.style.boxShadow = 'none'; // 移除非激活标签的阴影
-          }
-        });
-      }
-
-      topicCardElement.addEventListener('click', (e) => {
-        if (e.target.closest('.category-selector')) {
-          return;
-        }
-        displayNewTopic();
-      });
-
-      refreshButton.addEventListener('click', (e) => {
-        e.stopPropagation();
-        displayNewTopic();
-      });
-
-      categorySelectors.forEach((selector) => {
-        selector.addEventListener('click', (e) => {
-          e.stopPropagation();
-          setActiveCategory(selector.dataset.categoryId);
-        });
-      });
-      // 初始调用 setActiveCategory 已移至 fetch 的 .then() 块中
-      // setActiveCategory(currentCategoryId); // 删除此行
     </script>
-  </body>
+</body>
 </html>
