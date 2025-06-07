@@ -13,8 +13,8 @@
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh;
-        padding-top: 100px;
-        padding-bottom: 80px;
+        padding-top: 80px; /* 减少顶部padding */
+        padding-bottom: 100px; /* 增加底部padding为返回键留空间 */
         overflow-x: hidden;
       }
 
@@ -77,7 +77,7 @@
       #topic-card {
         /* This is the main active card area */
         position: relative;
-        padding-top: 80px;
+        padding-top: 70px; /* 减少顶部padding */
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
           0px 4px 12px rgba(0, 0, 0, 0.25); /* Shadow only on the main card */
         touch-action: pan-x;
@@ -89,7 +89,7 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 80px;
+        height: 70px; /* 减少高度 */
         display: flex;
         justify-content: center;
         align-items: flex-start;
@@ -153,7 +153,7 @@
     <div class="container w-full max-w-[350px] p-4 flex flex-col items-center">
       <div
         id="topic-card"
-        class="w-full h-[500px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
+        class="w-full h-[480px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
       >
         <!-- 滑动指示器 -->
         <div id="swipe-left-indicator" class="swipe-indicator swipe-left">👈</div>
@@ -162,7 +162,7 @@
         <div id="category-selectors-container">
           <div
             data-category-id="surprise"
-            class="category-selector w-[264px] h-[100px]"
+            class="category-selector w-[264px] h-[90px]"
             style="background-color: #ffc9dc"
           >
             <div
@@ -178,7 +178,7 @@
           </div>
           <div
             data-category-id="intense"
-            class="category-selector w-[280px] h-[100px]"
+            class="category-selector w-[280px] h-[90px]"
             style="background-color: #b8b4ff"
           >
             <div
@@ -194,7 +194,7 @@
           </div>
           <div
             data-category-id="ontheedge"
-            class="category-selector w-[296px] h-[100px]"
+            class="category-selector w-[296px] h-[90px]"
             style="background-color: #a0e7e5"
           >
             <div
@@ -210,7 +210,7 @@
           </div>
           <div
             data-category-id="mildmode"
-            class="category-selector w-[316px] h-[100px]"
+            class="category-selector w-[316px] h-[90px]"
             style="background-color: #c8fd0b"
           >
             <div
@@ -312,133 +312,81 @@
         sel.style.left = initialTabPositions[id].left;
       });
 
-      // 滑动功能
-      let startX = 0;
-      let startY = 0;
-      let isSwipeStarted = false;
+      // 滑动功能 - 重新实现，修复问题
+      let touchStartX = 0;
+      let touchStartY = 0;
+      let isTouching = false;
+      let swipeThreshold = 50; // 滑动阈值
 
-      topicCardElement.addEventListener('touchstart', (e) => {
+      function handleTouchStart(e) {
+        // 如果点击的是分类选择器或刷新按钮，不处理滑动
         if (e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
           return;
         }
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        isSwipeStarted = true;
-      });
-
-      topicCardElement.addEventListener('touchmove', (e) => {
-        if (!isSwipeStarted || e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
-          return;
-        }
         
-        const currentX = e.touches[0].clientX;
-        const currentY = e.touches[0].clientY;
-        const diffX = currentX - startX;
-        const diffY = currentY - startY;
+        isTouching = true;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }
+
+      function handleTouchMove(e) {
+        if (!isTouching) return;
+        
+        const touchCurrentX = e.touches[0].clientX;
+        const touchCurrentY = e.touches[0].clientY;
+        const deltaX = touchCurrentX - touchStartX;
+        const deltaY = touchCurrentY - touchStartY;
         
         // 只有水平滑动距离大于垂直滑动距离时才处理
-        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > 20) {
           e.preventDefault(); // 防止页面滚动
           
-          if (diffX > 0) {
-            // 向右滑动
+          // 显示滑动指示器
+          if (deltaX > 0) {
             swipeRightIndicator.classList.add('show');
             swipeLeftIndicator.classList.remove('show');
           } else {
-            // 向左滑动
             swipeLeftIndicator.classList.add('show');
             swipeRightIndicator.classList.remove('show');
           }
         }
-      });
+      }
 
-      topicCardElement.addEventListener('touchend', (e) => {
-        if (!isSwipeStarted || e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
-          return;
-        }
+      function handleTouchEnd(e) {
+        if (!isTouching) return;
         
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-        const diffX = endX - startX;
-        const diffY = endY - startY;
+        const touchEndX = e.changedTouches[0].clientX;
+        const touchEndY = e.changedTouches[0].clientY;
+        const deltaX = touchEndX - touchStartX;
+        const deltaY = touchEndY - touchStartY;
         
-        // 隐藏指示器
+        // 隐藏滑动指示器
         swipeLeftIndicator.classList.remove('show');
         swipeRightIndicator.classList.remove('show');
         
-        // 只有水平滑动距离大于垂直滑动距离且超过阈值时才切换
-        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+        // 检查是否为有效滑动
+        if (Math.abs(deltaX) > Math.abs(deltaY) && Math.abs(deltaX) > swipeThreshold) {
           const currentIndex = categoryVisualOrder.indexOf(currentCategoryId);
           
-          if (diffX > 0 && currentIndex > 0) {
+          if (deltaX > 0 && currentIndex > 0) {
             // 向右滑动，切换到上一个分类
             setActiveCategory(categoryVisualOrder[currentIndex - 1]);
-          } else if (diffX < 0 && currentIndex < categoryVisualOrder.length - 1) {
+          } else if (deltaX < 0 && currentIndex < categoryVisualOrder.length - 1) {
             // 向左滑动，切换到下一个分类
             setActiveCategory(categoryVisualOrder[currentIndex + 1]);
           }
-        } else if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
-          // 如果是点击而不是滑动，显示新话题
+        } else if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) {
+          // 如果是轻微移动，视为点击
           displayNewTopic();
         }
         
-        isSwipeStarted = false;
-      });
+        isTouching = false;
+      }
 
-      // 鼠标事件支持（用于桌面测试）
-      let isMouseDown = false;
-      let mouseStartX = 0;
-
-      topicCardElement.addEventListener('mousedown', (e) => {
-        if (e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
-          return;
-        }
-        isMouseDown = true;
-        mouseStartX = e.clientX;
-      });
-
-      topicCardElement.addEventListener('mousemove', (e) => {
-        if (!isMouseDown || e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
-          return;
-        }
-        
-        const diffX = e.clientX - mouseStartX;
-        
-        if (Math.abs(diffX) > 30) {
-          if (diffX > 0) {
-            swipeRightIndicator.classList.add('show');
-            swipeLeftIndicator.classList.remove('show');
-          } else {
-            swipeLeftIndicator.classList.add('show');
-            swipeRightIndicator.classList.remove('show');
-          }
-        }
-      });
-
-      topicCardElement.addEventListener('mouseup', (e) => {
-        if (!isMouseDown || e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
-          return;
-        }
-        
-        const diffX = e.clientX - mouseStartX;
-        
-        swipeLeftIndicator.classList.remove('show');
-        swipeRightIndicator.classList.remove('show');
-        
-        if (Math.abs(diffX) > 50) {
-          const currentIndex = categoryVisualOrder.indexOf(currentCategoryId);
-          
-          if (diffX > 0 && currentIndex > 0) {
-            setActiveCategory(categoryVisualOrder[currentIndex - 1]);
-          } else if (diffX < 0 && currentIndex < categoryVisualOrder.length - 1) {
-            setActiveCategory(categoryVisualOrder[currentIndex + 1]);
-          }
-        } else if (Math.abs(diffX) < 10) {
-          displayNewTopic();
-        }
-        
-        isMouseDown = false;
-      });
+      // 添加触摸事件监听器
+      topicCardElement.addEventListener('touchstart', handleTouchStart, { passive: false });
+      topicCardElement.addEventListener('touchmove', handleTouchMove, { passive: false });
+      topicCardElement.addEventListener('touchend', handleTouchEnd, { passive: false });
 
       function getRandomTopic(questions) {
         if (!questions || questions.length === 0) return '这个类型暂时没有话题哦！';
@@ -509,19 +457,19 @@
           activeSelector.style.boxShadow = 'none';
         }
 
-        // 非激活卡片的堆叠样式 - 调整间距
+        // 非激活卡片的堆叠样式 - 进一步调整间距
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -20; // 减少间距，从-30改为-20
-            const scaleFactor = 0.08; // 减少缩放，从0.1改为0.08
-            const opacityFactor = 0.12; // 稍微调整透明度，从0.1改为0.12
+            const translateYFactor = -15; // 进一步减少间距，从-20改为-15
+            const scaleFactor = 0.06; // 进一步减少缩放，从0.08改为0.06
+            const opacityFactor = 0.15; // 调整透明度
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
             selector.style.zIndex = 40 - depth * 10;
-            selector.style.opacity = Math.max(0.3, 1 - depth * opacityFactor); // 最小透明度提高到0.3
+            selector.style.opacity = Math.max(0.4, 1 - depth * opacityFactor); // 最小透明度提高到0.4
             selector.style.boxShadow = 'none';
           }
         });
