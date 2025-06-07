@@ -76,6 +76,7 @@
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
           0px 4px 12px rgba(0, 0, 0, 0.25);
         touch-action: pan-x;
+        transition: transform 0.3s ease;
       }
 
       #category-selectors-container {
@@ -168,6 +169,11 @@
 
       .swipe-hint.hidden {
         display: none;
+      }
+
+      /* Card swipe animation */
+      .card-swiping {
+        transition: none !important;
       }
     </style>
   </head>
@@ -326,6 +332,8 @@
       );
       const swipeHint = document.getElementById('swipe-hint');
 
+      // 按顺序排列的分类数组
+      const categoryOrder = ['mildmode', 'ontheedge', 'intense', 'surprise'];
       const categoryVisualOrder = ['surprise', 'intense', 'ontheedge', 'mildmode'];
 
       const initialTabPositions = {
@@ -340,11 +348,13 @@
         sel.style.left = initialTabPositions[id].left;
       });
 
-      // Swipe functionality
+      // Swipe functionality with visual feedback
       let startX = 0;
       let startY = 0;
+      let currentX = 0;
       let isSwipeStarted = false;
       let hasInteracted = false;
+      let isDragging = false;
 
       function updateSwipeIndicator() {
         const dots = document.querySelectorAll('.swipe-dot');
@@ -364,23 +374,45 @@
         }
       }
 
+      function getNextCategory(direction) {
+        const currentIndex = categoryOrder.indexOf(currentCategoryId);
+        let newIndex;
+        
+        if (direction === 'next') {
+          newIndex = (currentIndex + 1) % categoryOrder.length;
+        } else {
+          newIndex = (currentIndex - 1 + categoryOrder.length) % categoryOrder.length;
+        }
+        
+        return categoryOrder[newIndex];
+      }
+
       topicCardElement.addEventListener('touchstart', (e) => {
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
+        currentX = startX;
         isSwipeStarted = true;
+        isDragging = false;
       }, { passive: true });
 
       topicCardElement.addEventListener('touchmove', (e) => {
         if (!isSwipeStarted) return;
         
-        const currentX = e.touches[0].clientX;
+        currentX = e.touches[0].clientX;
         const currentY = e.touches[0].clientY;
-        const diffX = Math.abs(currentX - startX);
+        const diffX = currentX - startX;
         const diffY = Math.abs(currentY - startY);
         
-        // If horizontal swipe is more significant than vertical, prevent default
-        if (diffX > diffY && diffX > 10) {
+        // 如果水平滑动距离大于垂直滑动距离，则认为是水平滑动
+        if (Math.abs(diffX) > diffY && Math.abs(diffX) > 10) {
+          isDragging = true;
           e.preventDefault();
+          
+          // 添加视觉反馈 - 卡片跟随手指移动
+          topicCardElement.classList.add('card-swiping');
+          const moveDistance = Math.min(Math.abs(diffX), 100); // 限制最大移动距离
+          const direction = diffX > 0 ? 1 : -1;
+          topicCardElement.style.transform = `translateX(${direction * moveDistance * 0.3}px) rotate(${direction * moveDistance * 0.1}deg)`;
         }
       }, { passive: false });
 
@@ -392,43 +424,63 @@
         const diffX = startX - endX;
         const diffY = Math.abs(startY - endY);
         
-        // Check if it's a horizontal swipe (more horizontal than vertical movement)
-        if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY) {
+        // 重置卡片位置
+        topicCardElement.classList.remove('card-swiping');
+        topicCardElement.style.transform = '';
+        
+        // 检查是否为水平滑动
+        if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY && isDragging) {
           hideSwipeHint();
           
-          const currentIndex = categoryVisualOrder.indexOf(currentCategoryId);
-          let newIndex;
-          
+          let nextCategory;
           if (diffX > 0) {
-            // Swipe left - go to next category
-            newIndex = (currentIndex + 1) % categoryVisualOrder.length;
+            // 向左滑动 - 下一个分类
+            nextCategory = getNextCategory('next');
           } else {
-            // Swipe right - go to previous category
-            newIndex = (currentIndex - 1 + categoryVisualOrder.length) % categoryVisualOrder.length;
+            // 向右滑动 - 上一个分类
+            nextCategory = getNextCategory('prev');
           }
           
-          setActiveCategory(categoryVisualOrder[newIndex]);
-        } else if (Math.abs(diffX) < 10 && diffY < 10) {
-          // It's a tap, not a swipe
+          setActiveCategory(nextCategory);
+        } else if (Math.abs(diffX) < 10 && diffY < 10 && !isDragging) {
+          // 点击事件
           hideSwipeHint();
           displayNewTopic();
         }
         
         isSwipeStarted = false;
+        isDragging = false;
       }, { passive: true });
 
       // Mouse events for desktop testing
       let isMouseDown = false;
       let mouseStartX = 0;
+      let mouseCurrentX = 0;
+      let isMouseDragging = false;
 
       topicCardElement.addEventListener('mousedown', (e) => {
         isMouseDown = true;
         mouseStartX = e.clientX;
+        mouseCurrentX = mouseStartX;
+        isMouseDragging = false;
       });
 
       topicCardElement.addEventListener('mousemove', (e) => {
         if (!isMouseDown) return;
-        e.preventDefault();
+        
+        mouseCurrentX = e.clientX;
+        const diffX = mouseCurrentX - mouseStartX;
+        
+        if (Math.abs(diffX) > 10) {
+          isMouseDragging = true;
+          e.preventDefault();
+          
+          // 添加视觉反馈
+          topicCardElement.classList.add('card-swiping');
+          const moveDistance = Math.min(Math.abs(diffX), 100);
+          const direction = diffX > 0 ? 1 : -1;
+          topicCardElement.style.transform = `translateX(${direction * moveDistance * 0.3}px) rotate(${direction * moveDistance * 0.1}deg)`;
+        }
       });
 
       topicCardElement.addEventListener('mouseup', (e) => {
@@ -436,25 +488,28 @@
         
         const diffX = mouseStartX - e.clientX;
         
-        if (Math.abs(diffX) > 50) {
+        // 重置卡片位置
+        topicCardElement.classList.remove('card-swiping');
+        topicCardElement.style.transform = '';
+        
+        if (Math.abs(diffX) > 50 && isMouseDragging) {
           hideSwipeHint();
           
-          const currentIndex = categoryVisualOrder.indexOf(currentCategoryId);
-          let newIndex;
-          
+          let nextCategory;
           if (diffX > 0) {
-            newIndex = (currentIndex + 1) % categoryVisualOrder.length;
+            nextCategory = getNextCategory('next');
           } else {
-            newIndex = (currentIndex - 1 + categoryVisualOrder.length) % categoryVisualOrder.length;
+            nextCategory = getNextCategory('prev');
           }
           
-          setActiveCategory(categoryVisualOrder[newIndex]);
-        } else if (Math.abs(diffX) < 10) {
+          setActiveCategory(nextCategory);
+        } else if (Math.abs(diffX) < 10 && !isMouseDragging) {
           hideSwipeHint();
           displayNewTopic();
         }
         
         isMouseDown = false;
+        isMouseDragging = false;
       });
 
       function getRandomTopic(questions) {
@@ -547,12 +602,15 @@
         window.location.href = 'index.html';
       }
 
-      // Keep the original click functionality for the category selectors
+      // 点击分类标签时按顺序切换
       categorySelectors.forEach((selector) => {
         selector.addEventListener('click', (e) => {
           e.stopPropagation();
           hideSwipeHint();
-          setActiveCategory(selector.dataset.categoryId);
+          
+          // 按顺序切换到下一个分类
+          const nextCategory = getNextCategory('next');
+          setActiveCategory(nextCategory);
         });
       });
 
