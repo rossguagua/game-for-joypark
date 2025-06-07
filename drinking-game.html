@@ -93,9 +93,40 @@
         justify-content: center;
         align-items: flex-start;
       }
+
+      .back-button {
+        position: fixed;
+        top: 60px;
+        left: 20px;
+        z-index: 100;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .back-button:hover {
+        background: rgba(0, 0, 0, 0.9);
+        transform: translateY(-1px);
+      }
+
+      .back-button:active {
+        transform: translateY(0);
+      }
     </style>
   </head>
   <body class="bg-[#151515] text-white">
+    <!-- Back Button -->
+    <button 
+      onclick="goBack()" 
+      class="back-button w-10 h-10 rounded-full flex items-center justify-center text-white"
+      aria-label="返回游戏库"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+    </button>
+
     <div class="container w-full max-w-[350px] p-4 flex flex-col items-center">
       <div
         id="topic-card"
@@ -330,6 +361,10 @@
             selector.style.boxShadow = 'none'; // 移除非激活标签的阴影
           }
         });
+      }
+
+      function goBack() {
+        window.location.href = 'index.html';
       }
 
       topicCardElement.addEventListener('click', (e) => {
