@@ -122,35 +122,75 @@
         
         /* Game specific backgrounds using uploaded images */
         .game-1 {
-            background-image: url('images/eat-chicken-battle-royale.png/image.png');
+            background-image: url('https://images.pexels.com/photos/163064/play-stone-network-networked-interactive-163064.jpeg');
+            background-size: cover;
+            background-position: center;
         }
         
         .game-2 {
-            background-image: url('images/second-kiss-mark.png/image.png');
+            background-image: url('https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg');
+            background-size: cover;
+            background-position: center;
         }
         
         .game-3 {
-            background-image: url('images/party-psychology.png/image.png');
+            background-image: url('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg');
+            background-size: cover;
+            background-position: center;
         }
         
         .game-4 {
-            background-image: url('images/jiubao-quick-wit.png/image.png');
+            background-image: url('https://images.pexels.com/photos/301703/pexels-photo-301703.jpeg');
+            background-size: cover;
+            background-position: center;
         }
         
         .game-5 {
-            background-image: url('images/man-di-piao-ling.png/image.png');
+            background-image: url('https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg');
+            background-size: cover;
+            background-position: center;
         }
         
         .game-6 {
-            background-image: url('images/jiubao-yuanyue-ye/image.png');
+            background: linear-gradient(135deg, #8B5CF6 0%, #A855F7 50%, #9333EA 100%);
+            position: relative;
+        }
+        
+        .game-6::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .game-6::after {
+            content: '🌙';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 40px;
+            z-index: 2;
         }
         
         .game-7 {
-            background-image: url('images/chun-ai-da-zuo-zhan.png/image.png');
+            background-image: url('https://images.pexels.com/photos/1181406/pexels-photo-1181406.jpeg');
+            background-size: cover;
+            background-position: center;
         }
         
         .game-8 {
-            background-image: url('images/de-zhou-pu-ke-pai.png/image.png');
+            background-image: url('https://images.pexels.com/photos/1040881/pexels-photo-1040881.jpeg');
+            background-size: cover;
+            background-position: center;
         }
         
         .coming-soon {
@@ -246,7 +286,7 @@
     <div class="main-container">
         <!-- Logo Section -->
         <div class="logo-section">
-            <img src="images/jiubao-park-logo.png/image.png" alt="酒宝公园" class="logo-image">
+            <div class="text-white text-2xl font-bold">酒宝公园</div>
         </div>
 
         <!-- Main Game Section -->
@@ -264,56 +304,80 @@
             <!-- 得吃大逃杀 -->
             <div class="game-card coming-soon" onclick="openGame('battle-royale')">
                 <div class="game-card-content game-1">
-                    <!-- Image background is set via CSS -->
+                    <div class="game-text-overlay">
+                        <div class="game-title">得吃大逃杀</div>
+                        <div class="game-subtitle">生存游戏</div>
+                    </div>
                 </div>
             </div>
 
             <!-- 二本吻痕 -->
             <div class="game-card coming-soon" onclick="openGame('kiss-marks')">
                 <div class="game-card-content game-2">
-                    <!-- Image background is set via CSS -->
+                    <div class="game-text-overlay">
+                        <div class="game-title">二本吻痕</div>
+                        <div class="game-subtitle">浪漫游戏</div>
+                    </div>
                 </div>
             </div>
 
             <!-- 派对心理学 -->
             <div class="game-card coming-soon" onclick="openGame('party-psychology')">
                 <div class="game-card-content game-3">
-                    <!-- Image background is set via CSS -->
+                    <div class="game-text-overlay">
+                        <div class="game-title">派对心理学</div>
+                        <div class="game-subtitle">心理测试</div>
+                    </div>
                 </div>
             </div>
 
             <!-- 酒宝急生智 -->
             <div class="game-card coming-soon" onclick="openGame('wisdom')">
                 <div class="game-card-content game-4">
-                    <!-- Image background is set via CSS -->
+                    <div class="game-text-overlay">
+                        <div class="game-title">酒宝急生智</div>
+                        <div class="game-subtitle">智力挑战</div>
+                    </div>
                 </div>
             </div>
 
             <!-- 满地飘零 -->
             <div class="game-card coming-soon" onclick="openGame('man-di-piao-ling')">
                 <div class="game-card-content game-5">
-                    <!-- Image background is set via CSS -->
+                    <div class="game-text-overlay">
+                        <div class="game-title">满地飘零</div>
+                        <div class="game-subtitle">策略游戏</div>
+                    </div>
                 </div>
             </div>
 
             <!-- 酒宝月圆夜 -->
             <div class="game-card coming-soon" onclick="openGame('moon-night')">
                 <div class="game-card-content game-6">
-                    <!-- Image background is now set via CSS using the correct path -->
+                    <div class="game-text-overlay">
+                        <div class="game-title">酒宝月圆夜</div>
+                        <div class="game-subtitle">狼人杀</div>
+                    </div>
                 </div>
             </div>
 
             <!-- 纯爱大作战 -->
             <div class="game-card coming-soon" onclick="openGame('love-battle')">
                 <div class="game-card-content game-7">
-                    <!-- Image background is set via CSS -->
+                    <div class="game-text-overlay">
+                        <div class="game-title">纯爱大作战</div>
+                        <div class="game-subtitle">恋爱模拟</div>
+                    </div>
                 </div>
             </div>
 
             <!-- 德州扑克牌 -->
             <div class="game-card coming-soon" onclick="openGame('poker')">
                 <div class="game-card-content game-8">
-                    <!-- Image background is set via CSS -->
+                    <div class="game-text-overlay">
+                        <div class="game-title">德州扑克牌</div>
+                        <div class="game-subtitle">扑克游戏</div>
+                    </div>
                 </div>
             </div>
         </div>
