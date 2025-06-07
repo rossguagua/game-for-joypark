@@ -13,8 +13,8 @@
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh;
-        padding-top: 60px; /* 进一步减少顶部padding，往上移动 */
-        padding-bottom: 100px; /* 保持底部padding为返回键留空间 */
+        padding-top: 80px; /* 增加顶部padding，整体下移 */
+        padding-bottom: 100px;
         overflow-x: hidden;
       }
 
@@ -72,14 +72,15 @@
         border-radius: 0.75rem; /* 12px */
         box-shadow: none;
         cursor: pointer;
+        overflow: hidden; /* 防止内容溢出 */
       }
 
       #topic-card {
         /* This is the main active card area */
         position: relative;
-        padding-top: 80px; /* 增加顶部padding为标签留出更多空间 */
+        padding-top: 90px; /* 增加顶部padding为标签留出更多空间 */
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
-          0px 4px 12px rgba(0, 0, 0, 0.25); /* Shadow only on the main card */
+          0px 4px 12px rgba(0, 0, 0, 0.25);
         touch-action: pan-x;
       }
 
@@ -89,7 +90,7 @@
         top: 0;
         left: 0;
         right: 0;
-        height: 80px; /* 增加高度为标签留出更多空间 */
+        height: 90px; /* 增加高度为标签留出更多空间 */
         display: flex;
         justify-content: center;
         align-items: flex-start;
@@ -457,19 +458,19 @@
           activeSelector.style.boxShadow = 'none';
         }
 
-        // 非激活卡片的堆叠样式 - 增加间距让所有卡片都可见
+        // 非激活卡片的堆叠样式 - 修正穿透问题
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -25; // 增加间距，从-15改为-25
-            const scaleFactor = 0.05; // 减少缩放，从0.06改为0.05
-            const opacityFactor = 0.12; // 调整透明度
+            const translateYFactor = -20; // 减少间距，防止穿透
+            const scaleFactor = 0.04; // 进一步减少缩放
+            const opacityFactor = 0.15; // 调整透明度
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
-            selector.style.zIndex = 40 - depth * 10;
-            selector.style.opacity = Math.max(0.5, 1 - depth * opacityFactor); // 最小透明度提高到0.5
+            selector.style.zIndex = 40 - depth * 5; // 减少z-index间距，确保层次正确
+            selector.style.opacity = Math.max(0.6, 1 - depth * opacityFactor); // 提高最小透明度
             selector.style.boxShadow = 'none';
           }
         });
