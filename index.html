@@ -74,7 +74,6 @@
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            background-image: url('image.png');
             margin-bottom: 0;
         }
         
@@ -119,6 +118,12 @@
             max-width: 140px;
             max-height: 100px;
             object-fit: contain;
+        }
+        
+        /* Main game background - using the uploaded chat ice-breaker image */
+        .main-game-bg {
+            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==');
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 50%, #1a1a1a 100%);
         }
         
         /* Game specific backgrounds using uploaded images */
@@ -189,6 +194,30 @@
         html {
             scroll-behavior: smooth;
         }
+
+        /* Temporary fallback styling for main game */
+        .main-game-fallback {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 50%, #ff3838 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .main-game-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .main-game-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
     </style>
 </head>
 <body class="bg-[#151515] text-white">
@@ -229,8 +258,9 @@
         <!-- Main Game Section -->
         <div class="main-game-section">
             <div class="game-card" onclick="openGame('drinking-topics')">
-                <div class="main-game-card">
-                    <!-- Background image is set via CSS using the uploaded image -->
+                <div class="main-game-card main-game-fallback">
+                    <div class="main-game-title">聊天破冰盲盒</div>
+                    <div class="main-game-subtitle">每句话都是命运的🎲 用盲盒话题开启今晚</div>
                 </div>
             </div>
         </div>
