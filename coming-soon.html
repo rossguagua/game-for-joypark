@@ -12,30 +12,11 @@
             overflow-x: hidden;
             margin: 0;
             padding: 0;
-        }
-        
-        .back-button {
-            position: fixed;
-            top: 60px;
-            left: 20px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        .back-button:hover {
-            background: rgba(0, 0, 0, 0.9);
-            transform: translateY(-1px);
-        }
-
-        .back-button:active {
-            transform: translateY(0);
+            padding-bottom: 120px; /* Add bottom padding for back button */
         }
 
         .coming-soon-container {
-            min-height: 100vh;
+            min-height: calc(100vh - 120px);
             display: flex;
             flex-direction: column;
             justify-content: center;
@@ -80,20 +61,49 @@
             max-width: 320px;
             margin-top: 24px;
         }
+
+        .back-button-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(21, 21, 21, 0.95));
+            backdrop-filter: blur(10px);
+            padding: 20px;
+            z-index: 100;
+        }
+
+        .back-button {
+            width: 100%;
+            max-width: 350px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px 24px;
+            border-radius: 16px;
+            color: white;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .back-button:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .back-button:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="bg-[#151515] text-white">
-    <!-- Back Button -->
-    <button 
-        onclick="goBack()" 
-        class="back-button w-10 h-10 rounded-full flex items-center justify-center text-white"
-        aria-label="返回游戏库"
-    >
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-        </svg>
-    </button>
-
     <div class="coming-soon-container">
         <div class="game-icon pulse-animation">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-16 h-16 text-white">
@@ -116,11 +126,14 @@
                 </p>
             </div>
         </div>
+    </div>
 
-        <button 
-            onclick="goBack()" 
-            class="mt-8 bg-white bg-opacity-10 hover:bg-opacity-20 text-white px-6 py-3 rounded-full transition-all duration-300 backdrop-blur-sm border border-white border-opacity-20"
-        >
+    <!-- Back Button Container -->
+    <div class="back-button-container">
+        <button onclick="goBack()" class="back-button">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
             返回游戏库
         </button>
     </div>
