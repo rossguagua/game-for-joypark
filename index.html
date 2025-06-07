@@ -74,9 +74,12 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 16px;
+            padding: 0;
             color: white;
             font-weight: bold;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
         }
         
         .game-title {
@@ -91,29 +94,27 @@
             font-weight: 500;
         }
         
-        .logo-text {
-            color: white;
-            font-size: 24px;
-            font-weight: 900;
-            text-align: center;
-            letter-spacing: 2px;
+        .logo-image {
+            max-width: 120px;
+            max-height: 80px;
+            object-fit: contain;
         }
         
-        /* Game specific backgrounds */
+        /* Game specific backgrounds using uploaded images */
         .game-1 {
-            background: linear-gradient(135deg, #ff4757 0%, #ff3742 50%, #c44569 100%);
+            background-image: url('images/eat-chicken-battle-royale.png/image.png');
         }
         
         .game-2 {
-            background: linear-gradient(135deg, #5352ed 0%, #3742fa 50%, #2f3542 100%);
+            background-image: url('images/second-kiss-mark.png/image.png');
         }
         
         .game-3 {
-            background: linear-gradient(135deg, #70a1ff 0%, #5352ed 50%, #3742fa 100%);
+            background-image: url('images/party-psychology.png/image.png');
         }
         
         .game-4 {
-            background: linear-gradient(135deg, #2f3542 0%, #57606f 50%, #747d8c 100%);
+            background-image: url('images/jiubao-quick-wit.png/image.png');
         }
         
         .game-5 {
@@ -141,6 +142,17 @@
             border-radius: 12px;
             font-size: 11px;
             font-weight: 600;
+        }
+
+        /* Text overlay for better readability on images */
+        .game-text-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            padding: 16px;
+            border-radius: 0 0 16px 16px;
         }
     </style>
 </head>
@@ -174,10 +186,7 @@
 
     <!-- Logo -->
     <div class="logo-container">
-        <div class="logo-text">
-            <div style="font-size: 28px; font-weight: 900; margin-bottom: 4px;">酒宝</div>
-            <div style="font-size: 28px; font-weight: 900;">公园</div>
-        </div>
+        <img src="images/jiubao-park-logo.png/image.png" alt="酒宝公园" class="logo-image">
     </div>
 
     <!-- Main Content -->
@@ -186,62 +195,52 @@
             <!-- 得吃大逃杀 -->
             <div class="game-card coming-soon" onclick="openGame('battle-royale')">
                 <div class="game-card-content game-1">
-                    <div>
-                        <div class="game-title">得</div>
-                        <div class="game-title">吃</div>
-                        <div class="game-title">大逃杀</div>
-                    </div>
-                    <div class="game-subtitle">生存竞技游戏</div>
+                    <!-- Image background is set via CSS -->
                 </div>
             </div>
 
-            <!-- 一本吻痕 -->
+            <!-- 二本吻痕 -->
             <div class="game-card coming-soon" onclick="openGame('kiss-marks')">
                 <div class="game-card-content game-2">
-                    <div>
-                        <div class="game-title">一本吻痕</div>
-                    </div>
-                    <div class="game-subtitle">浪漫互动</div>
+                    <!-- Image background is set via CSS -->
                 </div>
             </div>
 
-            <!-- 喝酒话题游戏 (Your existing game) -->
+            <!-- 派对心理学 (Your existing game) -->
             <div class="game-card" onclick="openGame('drinking-topics')">
                 <div class="game-card-content game-3">
-                    <div>
-                        <div class="game-title">喝酒话题</div>
-                    </div>
-                    <div class="game-subtitle">聊天破冰神器</div>
+                    <!-- Image background is set via CSS -->
                 </div>
             </div>
 
-            <!-- 酒宝生智 -->
+            <!-- 酒宝急生智 -->
             <div class="game-card coming-soon" onclick="openGame('wisdom')">
                 <div class="game-card-content game-4">
-                    <div>
-                        <div class="game-title">酒宝生智</div>
-                    </div>
-                    <div class="game-subtitle">智力挑战</div>
+                    <!-- Image background is set via CSS -->
                 </div>
             </div>
 
             <!-- 纯爱大作战 -->
             <div class="game-card coming-soon" onclick="openGame('love-battle')">
                 <div class="game-card-content game-5">
-                    <div>
-                        <div class="game-title">纯爱大作战</div>
+                    <div class="game-text-overlay">
+                        <div>
+                            <div class="game-title">纯爱大作战</div>
+                        </div>
+                        <div class="game-subtitle">恋爱模拟</div>
                     </div>
-                    <div class="game-subtitle">恋爱模拟</div>
                 </div>
             </div>
 
             <!-- 光 -->
             <div class="game-card coming-soon" onclick="openGame('light')">
                 <div class="game-card-content game-6">
-                    <div>
-                        <div class="game-title">光</div>
+                    <div class="game-text-overlay">
+                        <div>
+                            <div class="game-title">光</div>
+                        </div>
+                        <div class="game-subtitle">冒险解谜</div>
                     </div>
-                    <div class="game-subtitle">冒险解谜</div>
                 </div>
             </div>
         </div>
