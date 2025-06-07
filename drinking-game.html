@@ -347,19 +347,20 @@
           activeSelector.style.opacity = 1;
         }
 
-        // 恢复合理的堆叠效果
+        // 大幅度调整堆叠效果，确保所有卡片都清晰可见
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -25; // 恢复合理的堆叠间距
-            const scaleFactor = 0.08; // 恢复合理的缩放
-            const opacityFactor = 0.15; // 恢复合理的透明度
+            // 大幅增加堆叠间距和透明度，确保可见性
+            const translateYFactor = -50; // 大幅增加间距
+            const scaleFactor = 0.05; // 减少缩放差异
+            const opacityFactor = 0.1; // 减少透明度变化
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
             selector.style.zIndex = 40 - depth * 10;
-            selector.style.opacity = Math.max(0.3, 1 - depth * opacityFactor);
+            selector.style.opacity = Math.max(0.6, 1 - depth * opacityFactor); // 最低透明度提高到0.6
           }
         });
       }
