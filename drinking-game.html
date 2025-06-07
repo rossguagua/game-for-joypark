@@ -69,7 +69,7 @@
         position: absolute;
         border-radius: 0.75rem;
         cursor: pointer;
-        overflow: hidden; /* 防止内容溢出 */
+        overflow: hidden;
       }
 
       #topic-card {
@@ -88,7 +88,7 @@
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        overflow: hidden; /* 防止卡片溢出容器 */
+        overflow: hidden;
       }
 
       .back-button {
@@ -130,11 +130,11 @@
         <div id="category-selectors-container">
           <div
             data-category-id="surprise"
-            class="category-selector w-[240px] h-[100px]"
+            class="category-selector w-[264px] h-[100px]"
             style="background-color: #ffc9dc"
           >
             <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[120px] h-[32px] rounded-lg flex items-center justify-center"
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
               style="background-color: #f93c7e; color: #2df92a"
             >
               <div class="category-text-part">
@@ -146,11 +146,11 @@
           </div>
           <div
             data-category-id="intense"
-            class="category-selector w-[250px] h-[100px]"
+            class="category-selector w-[280px] h-[100px]"
             style="background-color: #b8b4ff"
           >
             <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[120px] h-[32px] rounded-lg flex items-center justify-center"
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
               style="background-color: #342af6; color: #ff2470"
             >
               <div class="category-text-part">
@@ -162,11 +162,11 @@
           </div>
           <div
             data-category-id="ontheedge"
-            class="category-selector w-[260px] h-[100px]"
+            class="category-selector w-[296px] h-[100px]"
             style="background-color: #a0e7e5"
           >
             <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[120px] h-[32px] rounded-lg flex items-center justify-center"
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
               style="background-color: #ffc9dc; color: #560ee6"
             >
               <div class="category-text-part">
@@ -178,11 +178,11 @@
           </div>
           <div
             data-category-id="mildmode"
-            class="category-selector w-[270px] h-[100px]"
+            class="category-selector w-[316px] h-[100px]"
             style="background-color: #c8fd0b"
           >
             <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[120px] h-[32px] rounded-lg flex items-center justify-center"
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
               style="background-color: #2df92a; color: black"
             >
               <div class="category-text-part">
@@ -266,12 +266,12 @@
 
       const categoryVisualOrder = ['surprise', 'intense', 'ontheedge', 'mildmode'];
 
-      // 调整初始位置，确保卡片完全居中且不会溢出
+      // 恢复原始的卡片位置和尺寸
       const initialTabPositions = {
-        surprise: { left: 'calc(50% - 120px)' },
-        intense: { left: 'calc(50% - 125px)' },
-        ontheedge: { left: 'calc(50% - 130px)' },
-        mildmode: { left: 'calc(50% - 135px)' },
+        surprise: { left: 'calc(50% - 132px)' },
+        intense: { left: 'calc(50% - 140px)' },
+        ontheedge: { left: 'calc(50% - 148px)' },
+        mildmode: { left: 'calc(50% - 158px)' },
       };
 
       categorySelectors.forEach((sel) => {
@@ -328,7 +328,7 @@
 
       function setActiveCategory(newCategoryId) {
         currentCategoryId = newCategoryId;
-        lastTopicIndex = -1; // 切换分类时重置 lastTopicIndex
+        lastTopicIndex = -1;
         updateTopicCardUnifiedStyle();
         displayNewTopic();
 
@@ -347,19 +347,19 @@
           activeSelector.style.opacity = 1;
         }
 
-        // 非激活卡片的堆叠样式 - 调整参数防止溢出
+        // 恢复合理的堆叠效果
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -15; // 减小堆叠间距
-            const scaleFactor = 0.04; // 减小每层收缩
-            const opacityFactor = 0.2; // 增加透明度降低
+            const translateYFactor = -25; // 恢复合理的堆叠间距
+            const scaleFactor = 0.08; // 恢复合理的缩放
+            const opacityFactor = 0.15; // 恢复合理的透明度
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
             selector.style.zIndex = 40 - depth * 10;
-            selector.style.opacity = Math.max(0.2, 1 - depth * opacityFactor);
+            selector.style.opacity = Math.max(0.3, 1 - depth * opacityFactor);
           }
         });
       }
