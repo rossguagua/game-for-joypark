@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒宝公园 - 游戏库</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #151515;
+            overflow-x: hidden;
+        }
+        
+        .status-bar {
+            background: #151515;
+            height: 48px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        
+        .game-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .game-card:active {
+            transform: translateY(-2px);
+        }
+        
+        .scroll-container {
+            padding-top: 178px;
+            padding-bottom: 40px;
+            min-height: 100vh;
+        }
+        
+        .logo-container {
+            position: fixed;
+            top: 48px;
+            left: 0;
+            right: 0;
+            background: #151515;
+            z-index: 90;
+            height: 130px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            padding: 0 34px;
+        }
+        
+        .game-card-image {
+            width: 100%;
+            height: 200px;
+            border-radius: 10px;
+            object-fit: cover;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .coming-soon {
+            opacity: 0.6;
+            position: relative;
+        }
+        
+        .coming-soon::after {
+            content: "即将推出";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body class="bg-[#151515] text-white">
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="flex items-center justify-between px-7 h-full">
+            <div class="text-white font-medium">9:41</div>
+            <div class="flex items-center space-x-2">
+                <!-- Signal bars -->
+                <div class="flex space-x-1">
+                    <div class="w-1 h-3 bg-white rounded-full"></div>
+                    <div class="w-1 h-4 bg-white rounded-full"></div>
+                    <div class="w-1 h-5 bg-white rounded-full"></div>
+                    <div class="w-1 h-6 bg-white rounded-full"></div>
+                </div>
+                <!-- WiFi -->
+                <div class="w-4 h-3 bg-white rounded-sm"></div>
+                <!-- Battery -->
+                <div class="flex items-center">
+                    <div class="w-6 h-3 border border-white border-opacity-35 rounded-sm">
+                        <div class="w-5 h-2 bg-white rounded-sm m-0.5"></div>
+                    </div>
+                    <div class="w-0.5 h-1 bg-white bg-opacity-40 ml-0.5 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Logo -->
+    <div class="logo-container">
+        <div class="w-32 h-32 bg-white bg-opacity-10 rounded-full flex items-center justify-center">
+            <span class="text-2xl font-bold text-white">酒宝公园</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="scroll-container">
+        <div class="game-grid">
+            <!-- 喝酒话题游戏 (Your existing game) -->
+            <div class="game-card" onclick="openGame('drinking-topics')">
+                <div class="game-card-image bg-gradient-to-br from-pink-400 to-purple-500 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <div class="text-lg font-bold mb-2">喝酒话题</div>
+                        <div class="text-sm opacity-80">聊天破冰神器</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 得吃大逃杀2.0 -->
+            <div class="game-card coming-soon">
+                <div class="game-card-image bg-gradient-to-br from-red-500 to-orange-500 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <div class="text-lg font-bold mb-2">得吃大逃杀</div>
+                        <div class="text-sm opacity-80">生存竞技</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 派对心理学 -->
+            <div class="game-card coming-soon">
+                <div class="game-card-image bg-gradient-to-br from-blue-500 to-teal-500 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <div class="text-lg font-bold mb-2">派对心理学</div>
+                        <div class="text-sm opacity-80">心理测试</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 酒宝急生智 -->
+            <div class="game-card coming-soon">
+                <div class="game-card-image bg-gradient-to-br from-yellow-500 to-red-500 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <div class="text-lg font-bold mb-2">酒宝急生智</div>
+                        <div class="text-sm opacity-80">智力挑战</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 酒宝月圆夜 -->
+            <div class="game-card coming-soon">
+                <div class="game-card-image bg-gradient-to-br from-purple-600 to-indigo-600 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <div class="text-lg font-bold mb-2">酒宝月圆夜</div>
+                        <div class="text-sm opacity-80">狼人杀</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 纯爱大作战 -->
+            <div class="game-card coming-soon">
+                <div class="game-card-image bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <div class="text-lg font-bold mb-2">纯爱大作战</div>
+                        <div class="text-sm opacity-80">恋爱模拟</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 德州扑克 -->
+            <div class="game-card coming-soon">
+                <div class="game-card-image bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <div class="text-lg font-bold mb-2">德州扑克</div>
+                        <div class="text-sm opacity-80">经典纸牌</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 真心话大冒险 -->
+            <div class="game-card coming-soon">
+                <div class="game-card-image bg-gradient-to-br from-cyan-500 to-blue-500 flex items-center justify-center">
+                    <div class="text-center text-white">
+                        <div class="text-lg font-bold mb-2">真心话大冒险</div>
+                        <div class="text-sm opacity-80">经典聚会</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openGame(gameId) {
+            switch(gameId) {
+                case 'drinking-topics':
+                    // Navigate to your existing drinking topics game
+                    window.location.href = 'index.html';
+                    break;
+                default:
+                    // Show coming soon message for other games
+                    alert('该游戏即将推出，敬请期待！');
+            }
+        }
+
+        // Add smooth scrolling behavior
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add touch feedback for mobile
+            const gameCards = document.querySelectorAll('.game-card');
+            gameCards.forEach(card => {
+                card.addEventListener('touchstart', function() {
+                    this.style.transform = 'translateY(-2px) scale(0.98)';
+                });
+                
+                card.addEventListener('touchend', function() {
+                    this.style.transform = '';
+                });
+            });
+        });
+    </script>
+</body>
+</html>

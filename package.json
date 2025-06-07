@@ -1,0 +1,17 @@
+{
+  "name": "game-library",
+  "version": "1.0.0",
+  "description": "A mobile game library with drinking games",
+  "main": "index.html",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve .",
+    "build": "echo 'Build complete'"
+  },
+  "keywords": ["games", "mobile", "drinking-games"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "serve": "^14.2.0"
+  }
+}
