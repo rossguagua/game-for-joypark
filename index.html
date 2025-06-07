@@ -120,14 +120,6 @@
             object-fit: contain;
         }
         
-        /* Main game background - using the uploaded image */
-        .main-game-bg {
-            background-image: url('images/image copy copy.png');
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-        
         /* Game specific backgrounds using uploaded images */
         .game-1 {
             background-image: url('images/eat-chicken-battle-royale.png/image.png');
@@ -150,7 +142,7 @@
         }
         
         .game-6 {
-            background: linear-gradient(135deg, #ffa502 0%, #ff6348 50%, #ff4757 100%);
+            background-image: url('images/image.png');
         }
         
         .game-7 {
@@ -197,11 +189,28 @@
             scroll-behavior: smooth;
         }
 
-        /* Remove text content from main game since image contains all text */
-        .main-game-content {
-            /* Remove any text content since the image contains everything */
-            width: 100%;
-            height: 100%;
+        /* Main game fallback styling */
+        .main-game-fallback {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 50%, #ff3838 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .main-game-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .main-game-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
         }
     </style>
 </head>
@@ -243,10 +252,9 @@
         <!-- Main Game Section -->
         <div class="main-game-section">
             <div class="game-card" onclick="openGame('drinking-topics')">
-                <div class="main-game-card main-game-bg">
-                    <div class="main-game-content">
-                        <!-- Image contains all the text and design, no additional text needed -->
-                    </div>
+                <div class="main-game-card main-game-fallback">
+                    <div class="main-game-title">聊天破冰盲盒</div>
+                    <div class="main-game-subtitle">每句话都是命运的🎲 用盲盒话题开启今晚</div>
                 </div>
             </div>
         </div>
@@ -291,12 +299,7 @@
             <!-- 酒宝月圆夜 -->
             <div class="game-card coming-soon" onclick="openGame('moon-night')">
                 <div class="game-card-content game-6">
-                    <div class="game-text-overlay">
-                        <div>
-                            <div class="game-title">酒宝月圆夜</div>
-                        </div>
-                        <div class="game-subtitle">狼人杀</div>
-                    </div>
+                    <!-- Image background is set via CSS -->
                 </div>
             </div>
 
