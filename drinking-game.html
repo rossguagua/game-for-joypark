@@ -69,7 +69,6 @@
         position: absolute;
         border-radius: 0.75rem;
         cursor: pointer;
-        /* 确保卡片有足够的覆盖 */
         overflow: hidden;
       }
 
@@ -78,8 +77,11 @@
         padding-top: 80px;
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
           0px 4px 12px rgba(0, 0, 0, 0.25);
-        /* 确保主卡片在最上层 */
-        z-index: 60;
+        /* 确保主卡片在最上层并完全覆盖 */
+        z-index: 100;
+        /* 添加背景确保完全覆盖 */
+        background: inherit;
+        border-radius: 0.75rem;
       }
 
       #category-selectors-container {
@@ -91,8 +93,19 @@
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        /* 降低容器层级，让主卡片覆盖 */
-        z-index: 50;
+        /* 确保选择器容器在主卡片下方 */
+        z-index: 10;
+      }
+
+      /* 主卡片内容区域，确保完全覆盖背景 */
+      .main-card-content {
+        position: relative;
+        z-index: 101;
+        background: inherit;
+        border-radius: 0.75rem;
+        width: 100%;
+        height: 100%;
+        min-height: 420px;
       }
 
       .back-button {
@@ -112,7 +125,7 @@
         gap: 8px;
         transition: all 0.3s ease;
         cursor: pointer;
-        z-index: 100;
+        z-index: 200;
       }
 
       .back-button:hover {
@@ -198,34 +211,37 @@
           </div>
         </div>
 
-        <div
-          id="topic-text"
-          class="text-3xl md:text-4xl font-extrabold uppercase text-center leading-tight flex items-center justify-center h-full px-4 mt-[20px] mb-auto"
-          style="letter-spacing: 0.02em"
-        >
-          点击卡片开始
-        </div>
-
-        <button
-          id="refresh-button"
-          aria-label="下一个话题"
-          class="bg-black rounded-full p-3 w-16 h-16 flex items-center justify-center text-white shadow-lg mb-6 z-50 hover:bg-gray-800 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-8 h-8"
+        <!-- 主卡片内容区域 -->
+        <div class="main-card-content">
+          <div
+            id="topic-text"
+            class="text-3xl md:text-4xl font-extrabold uppercase text-center leading-tight flex items-center justify-center h-full px-4 mt-[20px] mb-auto"
+            style="letter-spacing: 0.02em"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-            />
-          </svg>
-        </button>
+            点击卡片开始
+          </div>
+
+          <button
+            id="refresh-button"
+            aria-label="下一个话题"
+            class="bg-black rounded-full p-3 w-16 h-16 flex items-center justify-center text-white shadow-lg mb-6 z-50 hover:bg-gray-800 transition-colors mx-auto"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-8 h-8"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -343,26 +359,26 @@
           .filter((id) => id !== newCategoryId)
           .map((id) => categorySelectors.find((s) => s.dataset.categoryId === id));
 
-        // 激活卡片的样式
+        // 激活卡片的样式 - 确保在主卡片下方但可见
         if (activeSelector) {
           activeSelector.style.transform = 'translateY(0px) scale(1)';
-          activeSelector.style.zIndex = 45; // 降低层级，确保不会覆盖主卡片
+          activeSelector.style.zIndex = 20; // 在主卡片下方
           activeSelector.style.opacity = 1;
         }
 
-        // 非激活卡片的堆叠样式
+        // 非激活卡片的堆叠样式 - 大幅降低层级和透明度
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -15; // 减少堆叠间距
-            const scaleFactor = 0.03; // 减少每层收缩
-            const opacityFactor = 0.2; // 增加透明度降低，让后面的卡片更不明显
+            const translateYFactor = -8; // 减少堆叠间距
+            const scaleFactor = 0.02; // 减少每层收缩
+            const opacityFactor = 0.4; // 大幅增加透明度降低
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
-            selector.style.zIndex = 35 - depth * 5; // 确保都在主卡片下方
-            selector.style.opacity = Math.max(0.2, 1 - depth * opacityFactor); // 最低透明度提高到0.2
+            selector.style.zIndex = 15 - depth * 2; // 确保都在主卡片下方
+            selector.style.opacity = Math.max(0.1, 1 - depth * opacityFactor); // 最低透明度降到0.1
           }
         });
       }
