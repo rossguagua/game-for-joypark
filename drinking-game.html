@@ -69,8 +69,6 @@
         position: absolute;
         border-radius: 0.75rem;
         cursor: pointer;
-        /* 确保卡片有足够的覆盖 */
-        overflow: hidden;
       }
 
       #topic-card {
@@ -78,8 +76,6 @@
         padding-top: 80px;
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
           0px 4px 12px rgba(0, 0, 0, 0.25);
-        /* 确保主卡片在最上层 */
-        z-index: 60;
       }
 
       #category-selectors-container {
@@ -91,8 +87,6 @@
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        /* 降低容器层级，让主卡片覆盖 */
-        z-index: 50;
       }
 
       .back-button {
@@ -331,7 +325,7 @@
 
       function setActiveCategory(newCategoryId) {
         currentCategoryId = newCategoryId;
-        lastTopicIndex = -1;
+        lastTopicIndex = -1; // 切换分类时重置 lastTopicIndex
         updateTopicCardUnifiedStyle();
         displayNewTopic();
 
@@ -346,7 +340,7 @@
         // 激活卡片的样式
         if (activeSelector) {
           activeSelector.style.transform = 'translateY(0px) scale(1)';
-          activeSelector.style.zIndex = 45; // 降低层级，确保不会覆盖主卡片
+          activeSelector.style.zIndex = 50;
           activeSelector.style.opacity = 1;
         }
 
@@ -354,15 +348,15 @@
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -15; // 减少堆叠间距
-            const scaleFactor = 0.03; // 减少每层收缩
-            const opacityFactor = 0.2; // 增加透明度降低，让后面的卡片更不明显
+            const translateYFactor = -20; // 堆叠间距
+            const scaleFactor = 0.05; // 每层收缩
+            const opacityFactor = 0.15; // 每层透明度降低
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
-            selector.style.zIndex = 35 - depth * 5; // 确保都在主卡片下方
-            selector.style.opacity = Math.max(0.2, 1 - depth * opacityFactor); // 最低透明度提高到0.2
+            selector.style.zIndex = 40 - depth * 10;
+            selector.style.opacity = Math.max(0.3, 1 - depth * opacityFactor);
           }
         });
       }
