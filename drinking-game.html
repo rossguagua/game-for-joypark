@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>聊天破冰盲盒</title>
+    <title>喝酒话题游戏</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
       body {
@@ -11,9 +11,9 @@
         background-color: #151515;
         display: flex;
         justify-content: center;
-        align-items: center;
+        align-items: flex-start;
         min-height: 100vh;
-        padding: 20px;
+        padding-top: 100px;
         padding-bottom: 80px;
         overflow-x: hidden;
       }
@@ -46,9 +46,25 @@
         }
       }
 
+      .font-mi-sans {
+        /* Placeholder */
+      }
+      .font-rajdhani {
+        /* Placeholder */
+      }
+
+      .category-text-part {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.2;
+        height: 100%;
+      }
+
       .category-selector {
         transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55),
-          opacity 0.4s ease-out, box-shadow 0.4s ease-out;
+          opacity 0.4s ease-out;
         transform-origin: center top;
         position: absolute;
         border-radius: 0.75rem;
@@ -61,6 +77,10 @@
         padding-top: 80px;
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
           0px 4px 12px rgba(0, 0, 0, 0.25);
+        /* 确保主卡片在最上层并完全覆盖 */
+        z-index: 100;
+        /* 添加背景确保完全覆盖 */
+        background: inherit;
         border-radius: 0.75rem;
       }
 
@@ -73,6 +93,19 @@
         display: flex;
         justify-content: center;
         align-items: flex-start;
+        /* 确保选择器容器在主卡片下方 */
+        z-index: 10;
+      }
+
+      /* 主卡片内容区域，确保完全覆盖背景 */
+      .main-card-content {
+        position: relative;
+        z-index: 101;
+        background: inherit;
+        border-radius: 0.75rem;
+        width: 100%;
+        height: 100%;
+        min-height: 420px;
       }
 
       .back-button {
@@ -121,7 +154,11 @@
               class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
               style="background-color: #f93c7e; color: #2df92a"
             >
-              <span class="text-xs font-medium">盲盒 Surprise Me</span>
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >盲盒 Surprise Me</span
+                >
+              </div>
             </div>
           </div>
           <div
@@ -133,7 +170,11 @@
               class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
               style="background-color: #342af6; color: #ff2470"
             >
-              <span class="text-xs font-medium">加麻加辣 Intense</span>
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >加麻加辣 Intense</span
+                >
+              </div>
             </div>
           </div>
           <div
@@ -145,7 +186,11 @@
               class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
               style="background-color: #ffc9dc; color: #560ee6"
             >
-              <span class="text-xs font-medium">微辣 On the Edge</span>
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >微辣 On the Edge</span
+                >
+              </div>
             </div>
           </div>
           <div
@@ -157,39 +202,46 @@
               class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
               style="background-color: #2df92a; color: black"
             >
-              <span class="text-xs font-medium">清汤 Mild Mode</span>
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >清汤 Mild Mode</span
+                >
+              </div>
             </div>
           </div>
         </div>
 
-        <div
-          id="topic-text"
-          class="text-3xl md:text-4xl font-extrabold uppercase text-center leading-tight flex items-center justify-center h-full px-4 mt-[20px] mb-auto"
-          style="letter-spacing: 0.02em"
-        >
-          点击卡片开始
-        </div>
-
-        <button
-          id="refresh-button"
-          aria-label="下一个话题"
-          class="bg-black rounded-full p-3 w-16 h-16 flex items-center justify-center text-white shadow-lg mb-6 z-50 hover:bg-gray-800 transition-colors"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="2"
-            stroke="currentColor"
-            class="w-8 h-8"
+        <!-- 主卡片内容区域 -->
+        <div class="main-card-content">
+          <div
+            id="topic-text"
+            class="text-3xl md:text-4xl font-extrabold uppercase text-center leading-tight flex items-center justify-center h-full px-4 mt-[20px] mb-auto"
+            style="letter-spacing: 0.02em"
           >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-            />
-          </svg>
-        </button>
+            点击卡片开始
+          </div>
+
+          <button
+            id="refresh-button"
+            aria-label="下一个话题"
+            class="bg-black rounded-full p-3 w-16 h-16 flex items-center justify-center text-white shadow-lg mb-6 z-50 hover:bg-gray-800 transition-colors mx-auto"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="2"
+              stroke="currentColor"
+              class="w-8 h-8"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+              />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
@@ -214,6 +266,7 @@
         })
         .then((data) => {
           topicsData = data;
+          // 数据加载完成后，再进行初始化
           setActiveCategory(currentCategoryId);
         })
         .catch((error) => {
@@ -306,28 +359,26 @@
           .filter((id) => id !== newCategoryId)
           .map((id) => categorySelectors.find((s) => s.dataset.categoryId === id));
 
-        // 激活卡片的样式
+        // 激活卡片的样式 - 确保在主卡片下方但可见
         if (activeSelector) {
           activeSelector.style.transform = 'translateY(0px) scale(1)';
-          activeSelector.style.zIndex = 50;
+          activeSelector.style.zIndex = 20; // 在主卡片下方
           activeSelector.style.opacity = 1;
-          activeSelector.style.boxShadow = '0 4px 15px rgba(0, 0, 0, 0.2)';
         }
 
-        // 非激活卡片的堆叠样式
+        // 非激活卡片的堆叠样式 - 大幅降低层级和透明度
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -8;
-            const scaleFactor = 0.02;
-            const opacityFactor = 0.15;
+            const translateYFactor = -8; // 减少堆叠间距
+            const scaleFactor = 0.02; // 减少每层收缩
+            const opacityFactor = 0.4; // 大幅增加透明度降低
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
-            selector.style.zIndex = 40 - depth * 5;
-            selector.style.opacity = Math.max(0.3, 1 - depth * opacityFactor);
-            selector.style.boxShadow = `0 ${2 + depth}px ${8 + depth * 2}px rgba(0, 0, 0, ${0.1 + depth * 0.05})`;
+            selector.style.zIndex = 15 - depth * 2; // 确保都在主卡片下方
+            selector.style.opacity = Math.max(0.1, 1 - depth * opacityFactor); // 最低透明度降到0.1
           }
         });
       }
