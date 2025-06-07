@@ -262,10 +262,8 @@
         document.querySelectorAll('.category-selector')
       );
 
-      // 定义卡片的固定堆叠顺序（从最底层到最顶层）
-      const stackOrder = ['mildmode', 'ontheedge', 'intense', 'surprise'];
+      const categoryVisualOrder = ['surprise', 'intense', 'ontheedge', 'mildmode'];
 
-      // 初始位置设置
       const initialTabPositions = {
         surprise: { left: 'calc(50% - 132px)' },
         intense: { left: 'calc(50% - 140px)' },
@@ -327,51 +325,38 @@
 
       function setActiveCategory(newCategoryId) {
         currentCategoryId = newCategoryId;
-        lastTopicIndex = -1;
+        lastTopicIndex = -1; // 切换分类时重置 lastTopicIndex
         updateTopicCardUnifiedStyle();
         displayNewTopic();
 
-        // 找到当前激活的卡片
         const activeSelector = categorySelectors.find(
           (s) => s.dataset.categoryId === newCategoryId
         );
 
-        // 根据固定的堆叠顺序重新排列所有卡片
-        stackOrder.forEach((categoryId, index) => {
-          const selector = categorySelectors.find(
-            (s) => s.dataset.categoryId === categoryId
-          );
-          
-          if (!selector) return;
+        const inactiveSelectorsOrdered = categoryVisualOrder
+          .filter((id) => id !== newCategoryId)
+          .map((id) => categorySelectors.find((s) => s.dataset.categoryId === id));
 
-          if (categoryId === newCategoryId) {
-            // 激活的卡片
-            selector.style.transform = 'translateY(0px) scale(1)';
-            selector.style.zIndex = 100; // 最高层级
-            selector.style.opacity = 1;
-          } else {
-            // 非激活卡片的堆叠效果
-            // 计算这个卡片在堆叠中的深度（激活卡片不计入深度）
-            const activeIndex = stackOrder.indexOf(newCategoryId);
-            let depth;
-            
-            if (index < activeIndex) {
-              // 在激活卡片之前的卡片
-              depth = activeIndex - index;
-            } else {
-              // 在激活卡片之后的卡片
-              depth = index - activeIndex;
-            }
+        // 激活卡片的样式
+        if (activeSelector) {
+          activeSelector.style.transform = 'translateY(0px) scale(1)';
+          activeSelector.style.zIndex = 50;
+          activeSelector.style.opacity = 1;
+        }
 
-            const translateYFactor = -15; // 堆叠间距
-            const scaleFactor = 0.03; // 每层收缩
-            const opacityFactor = 0.12; // 每层透明度降低
+        // 非激活卡片的堆叠样式
+        inactiveSelectorsOrdered.forEach((selector, index) => {
+          if (selector) {
+            const depth = index + 1;
+            const translateYFactor = -20; // 堆叠间距
+            const scaleFactor = 0.05; // 每层收缩
+            const opacityFactor = 0.15; // 每层透明度降低
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
-            selector.style.zIndex = 90 - depth * 10; // 确保层级正确
-            selector.style.opacity = Math.max(0.4, 1 - depth * opacityFactor);
+            selector.style.zIndex = 40 - depth * 10;
+            selector.style.opacity = Math.max(0.3, 1 - depth * opacityFactor);
           }
         });
       }
