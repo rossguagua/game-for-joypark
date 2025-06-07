@@ -14,7 +14,7 @@
         align-items: flex-start;
         min-height: 100vh;
         padding-top: 100px;
-        padding-bottom: 120px;
+        padding-bottom: 80px;
         overflow-x: hidden;
       }
 
@@ -71,6 +71,7 @@
         position: absolute;
         border-radius: 0.75rem; /* 12px */
         box-shadow: none;
+        cursor: pointer;
       }
 
       #topic-card {
@@ -79,6 +80,7 @@
         padding-top: 80px;
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
           0px 4px 12px rgba(0, 0, 0, 0.25); /* Shadow only on the main card */
+        touch-action: pan-x;
       }
 
       #category-selectors-container {
@@ -93,44 +95,57 @@
         align-items: flex-start;
       }
 
-      .back-button-container {
+      .back-button {
         position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: linear-gradient(transparent, rgba(21, 21, 21, 0.95));
-        backdrop-filter: blur(10px);
-        padding: 20px;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
         z-index: 100;
       }
 
-      .back-button {
-        width: 100%;
-        max-width: 350px;
-        margin: 0 auto;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        backdrop-filter: blur(10px);
-        transition: all 0.3s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        gap: 8px;
-        padding: 16px 24px;
-        border-radius: 16px;
-        color: white;
-        font-weight: 600;
-        font-size: 16px;
-      }
-
       .back-button:hover {
-        background: rgba(255, 255, 255, 0.15);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateX(-50%) translateY(-2px);
       }
 
       .back-button:active {
-        transform: translateY(0);
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* 滑动相关样式 */
+      .swipe-indicator {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 24px;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        pointer-events: none;
+        z-index: 10;
+      }
+
+      .swipe-left {
+        left: 20px;
+      }
+
+      .swipe-right {
+        right: 20px;
+      }
+
+      .swipe-indicator.show {
+        opacity: 0.7;
       }
     </style>
   </head>
@@ -140,6 +155,10 @@
         id="topic-card"
         class="w-full h-[500px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
       >
+        <!-- 滑动指示器 -->
+        <div id="swipe-left-indicator" class="swipe-indicator swipe-left">👈</div>
+        <div id="swipe-right-indicator" class="swipe-indicator swipe-right">👉</div>
+
         <div id="category-selectors-container">
           <div
             data-category-id="surprise"
@@ -238,15 +257,13 @@
       </div>
     </div>
 
-    <!-- Back Button Container -->
-    <div class="back-button-container">
-      <button onclick="goBack()" class="back-button">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-        </svg>
-        返回游戏库
-      </button>
-    </div>
+    <!-- Simple Back Button -->
+    <button onclick="goBack()" class="back-button">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+      返回游戏库
+    </button>
 
     <script>
       let topicsData = {}; // 初始化为一个空对象
@@ -278,6 +295,8 @@
       const categorySelectors = Array.from(
         document.querySelectorAll('.category-selector')
       );
+      const swipeLeftIndicator = document.getElementById('swipe-left-indicator');
+      const swipeRightIndicator = document.getElementById('swipe-right-indicator');
 
       const categoryVisualOrder = ['surprise', 'intense', 'ontheedge', 'mildmode'];
 
@@ -291,6 +310,134 @@
       categorySelectors.forEach((sel) => {
         const id = sel.dataset.categoryId;
         sel.style.left = initialTabPositions[id].left;
+      });
+
+      // 滑动功能
+      let startX = 0;
+      let startY = 0;
+      let isSwipeStarted = false;
+
+      topicCardElement.addEventListener('touchstart', (e) => {
+        if (e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
+          return;
+        }
+        startX = e.touches[0].clientX;
+        startY = e.touches[0].clientY;
+        isSwipeStarted = true;
+      });
+
+      topicCardElement.addEventListener('touchmove', (e) => {
+        if (!isSwipeStarted || e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
+          return;
+        }
+        
+        const currentX = e.touches[0].clientX;
+        const currentY = e.touches[0].clientY;
+        const diffX = currentX - startX;
+        const diffY = currentY - startY;
+        
+        // 只有水平滑动距离大于垂直滑动距离时才处理
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 30) {
+          e.preventDefault(); // 防止页面滚动
+          
+          if (diffX > 0) {
+            // 向右滑动
+            swipeRightIndicator.classList.add('show');
+            swipeLeftIndicator.classList.remove('show');
+          } else {
+            // 向左滑动
+            swipeLeftIndicator.classList.add('show');
+            swipeRightIndicator.classList.remove('show');
+          }
+        }
+      });
+
+      topicCardElement.addEventListener('touchend', (e) => {
+        if (!isSwipeStarted || e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
+          return;
+        }
+        
+        const endX = e.changedTouches[0].clientX;
+        const endY = e.changedTouches[0].clientY;
+        const diffX = endX - startX;
+        const diffY = endY - startY;
+        
+        // 隐藏指示器
+        swipeLeftIndicator.classList.remove('show');
+        swipeRightIndicator.classList.remove('show');
+        
+        // 只有水平滑动距离大于垂直滑动距离且超过阈值时才切换
+        if (Math.abs(diffX) > Math.abs(diffY) && Math.abs(diffX) > 50) {
+          const currentIndex = categoryVisualOrder.indexOf(currentCategoryId);
+          
+          if (diffX > 0 && currentIndex > 0) {
+            // 向右滑动，切换到上一个分类
+            setActiveCategory(categoryVisualOrder[currentIndex - 1]);
+          } else if (diffX < 0 && currentIndex < categoryVisualOrder.length - 1) {
+            // 向左滑动，切换到下一个分类
+            setActiveCategory(categoryVisualOrder[currentIndex + 1]);
+          }
+        } else if (Math.abs(diffX) < 10 && Math.abs(diffY) < 10) {
+          // 如果是点击而不是滑动，显示新话题
+          displayNewTopic();
+        }
+        
+        isSwipeStarted = false;
+      });
+
+      // 鼠标事件支持（用于桌面测试）
+      let isMouseDown = false;
+      let mouseStartX = 0;
+
+      topicCardElement.addEventListener('mousedown', (e) => {
+        if (e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
+          return;
+        }
+        isMouseDown = true;
+        mouseStartX = e.clientX;
+      });
+
+      topicCardElement.addEventListener('mousemove', (e) => {
+        if (!isMouseDown || e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
+          return;
+        }
+        
+        const diffX = e.clientX - mouseStartX;
+        
+        if (Math.abs(diffX) > 30) {
+          if (diffX > 0) {
+            swipeRightIndicator.classList.add('show');
+            swipeLeftIndicator.classList.remove('show');
+          } else {
+            swipeLeftIndicator.classList.add('show');
+            swipeRightIndicator.classList.remove('show');
+          }
+        }
+      });
+
+      topicCardElement.addEventListener('mouseup', (e) => {
+        if (!isMouseDown || e.target.closest('.category-selector') || e.target.closest('#refresh-button')) {
+          return;
+        }
+        
+        const diffX = e.clientX - mouseStartX;
+        
+        swipeLeftIndicator.classList.remove('show');
+        swipeRightIndicator.classList.remove('show');
+        
+        if (Math.abs(diffX) > 50) {
+          const currentIndex = categoryVisualOrder.indexOf(currentCategoryId);
+          
+          if (diffX > 0 && currentIndex > 0) {
+            setActiveCategory(categoryVisualOrder[currentIndex - 1]);
+          } else if (diffX < 0 && currentIndex < categoryVisualOrder.length - 1) {
+            setActiveCategory(categoryVisualOrder[currentIndex + 1]);
+          }
+        } else if (Math.abs(diffX) < 10) {
+          displayNewTopic();
+        }
+        
+        isMouseDown = false;
       });
 
       function getRandomTopic(questions) {
@@ -359,24 +506,23 @@
           activeSelector.style.transform = 'translateY(0px) scale(1)';
           activeSelector.style.zIndex = 50;
           activeSelector.style.opacity = 1;
-          activeSelector.style.boxShadow = 'none'; // 移除激活标签的阴影
+          activeSelector.style.boxShadow = 'none';
         }
 
         // 非激活卡片的堆叠样式
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            // 可修改的堆叠效果变量：
-            const translateYFactor = -30; // 负值越大，间距越大
-            const scaleFactor = 0.1; // 值越大，每层收缩越多
-            const opacityFactor = 0.1; // 值越大，每层透明度降低越多
+            const translateYFactor = -30;
+            const scaleFactor = 0.1;
+            const opacityFactor = 0.1;
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
             selector.style.zIndex = 40 - depth * 10;
             selector.style.opacity = Math.max(0, 1 - depth * opacityFactor);
-            selector.style.boxShadow = 'none'; // 移除非激活标签的阴影
+            selector.style.boxShadow = 'none';
           }
         });
       }
@@ -384,13 +530,6 @@
       function goBack() {
         window.location.href = 'index.html';
       }
-
-      topicCardElement.addEventListener('click', (e) => {
-        if (e.target.closest('.category-selector')) {
-          return;
-        }
-        displayNewTopic();
-      });
 
       refreshButton.addEventListener('click', (e) => {
         e.stopPropagation();
