@@ -54,6 +54,30 @@
             background: #151515;
         }
         
+        .main-game-section {
+            padding: 0 24px 24px 24px;
+            max-width: 390px;
+            margin: 0 auto;
+        }
+        
+        .main-game-card {
+            width: 100%;
+            height: 200px;
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-image: url('image.png');
+            margin-bottom: 24px;
+        }
+        
         .game-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -202,6 +226,15 @@
             <img src="images/jiubao-park-logo.png/image.png" alt="酒宝公园" class="logo-image">
         </div>
 
+        <!-- Main Game Section -->
+        <div class="main-game-section">
+            <div class="game-card" onclick="openGame('drinking-topics')">
+                <div class="main-game-card">
+                    <!-- Background image is set via CSS using the uploaded image -->
+                </div>
+            </div>
+        </div>
+
         <!-- Game Grid -->
         <div class="game-grid">
             <!-- 得吃大逃杀 -->
@@ -218,8 +251,8 @@
                 </div>
             </div>
 
-            <!-- 派对心理学 (Your existing game) -->
-            <div class="game-card" onclick="openGame('drinking-topics')">
+            <!-- 派对心理学 -->
+            <div class="game-card coming-soon" onclick="openGame('party-psychology')">
                 <div class="game-card-content game-3">
                     <!-- Image background is set via CSS -->
                 </div>
@@ -271,8 +304,11 @@
         function openGame(gameId) {
             switch(gameId) {
                 case 'drinking-topics':
-                    // Navigate to your existing drinking topics game
+                    // Navigate to the drinking topics game
                     window.location.href = 'drinking-game.html';
+                    break;
+                case 'party-psychology':
+                    alert('派对心理学即将推出，敬请期待！');
                     break;
                 case 'battle-royale':
                     alert('得吃大逃杀即将推出，敬请期待！');
