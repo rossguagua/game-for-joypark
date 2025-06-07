@@ -68,6 +68,11 @@
         transform-origin: center top;
         position: absolute;
         border-radius: 0.75rem;
+        pointer-events: none; /* 只有第一张卡片可以点击 */
+      }
+
+      .category-selector.active {
+        pointer-events: auto; /* 激活的卡片可以点击 */
       }
 
       #topic-card {
@@ -185,33 +190,17 @@
       >
         <div id="category-selectors-container">
           <div
-            data-category-id="surprise"
-            class="category-selector w-[264px] h-[100px]"
-            style="background-color: #ffc9dc"
+            data-category-id="mildmode"
+            class="category-selector active w-[316px] h-[100px]"
+            style="background-color: #c8fd0b"
           >
             <div
               class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
-              style="background-color: #f93c7e; color: #2df92a"
+              style="background-color: #2df92a; color: black"
             >
               <div class="category-text-part">
                 <span class="text-xs font-medium font-mi-sans block"
-                  >盲盒 Surprise Me</span
-                >
-              </div>
-            </div>
-          </div>
-          <div
-            data-category-id="intense"
-            class="category-selector w-[280px] h-[100px]"
-            style="background-color: #b8b4ff"
-          >
-            <div
-              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
-              style="background-color: #342af6; color: #ff2470"
-            >
-              <div class="category-text-part">
-                <span class="text-xs font-medium font-mi-sans block"
-                  >加麻加辣 Intense</span
+                  >清汤 Mild Mode</span
                 >
               </div>
             </div>
@@ -233,17 +222,33 @@
             </div>
           </div>
           <div
-            data-category-id="mildmode"
-            class="category-selector w-[316px] h-[100px]"
-            style="background-color: #c8fd0b"
+            data-category-id="intense"
+            class="category-selector w-[280px] h-[100px]"
+            style="background-color: #b8b4ff"
           >
             <div
               class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
-              style="background-color: #2df92a; color: black"
+              style="background-color: #342af6; color: #ff2470"
             >
               <div class="category-text-part">
                 <span class="text-xs font-medium font-mi-sans block"
-                  >清汤 Mild Mode</span
+                  >加麻加辣 Intense</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            data-category-id="surprise"
+            class="category-selector w-[264px] h-[100px]"
+            style="background-color: #ffc9dc"
+          >
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #f93c7e; color: #2df92a"
+            >
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >盲盒 Surprise Me</span
                 >
               </div>
             </div>
@@ -287,7 +292,7 @@
 
       <!-- Swipe indicator dots -->
       <div class="swipe-indicator">
-        <div class="swipe-dot" data-category="mildmode"></div>
+        <div class="swipe-dot active" data-category="mildmode"></div>
         <div class="swipe-dot" data-category="ontheedge"></div>
         <div class="swipe-dot" data-category="intense"></div>
         <div class="swipe-dot" data-category="surprise"></div>
@@ -387,7 +392,12 @@
         return categoryOrder[newIndex];
       }
 
+      // 只有第一张卡片（激活的卡片）可以滑动
       topicCardElement.addEventListener('touchstart', (e) => {
+        // 检查是否点击在激活的卡片上
+        const activeSelector = document.querySelector('.category-selector.active');
+        if (!activeSelector) return;
+        
         startX = e.touches[0].clientX;
         startY = e.touches[0].clientY;
         currentX = startX;
@@ -408,11 +418,14 @@
           isDragging = true;
           e.preventDefault();
           
-          // 添加视觉反馈 - 卡片跟随手指移动
-          topicCardElement.classList.add('card-swiping');
-          const moveDistance = Math.min(Math.abs(diffX), 100); // 限制最大移动距离
-          const direction = diffX > 0 ? 1 : -1;
-          topicCardElement.style.transform = `translateX(${direction * moveDistance * 0.3}px) rotate(${direction * moveDistance * 0.1}deg)`;
+          // 只有激活的卡片跟随手指移动
+          const activeSelector = document.querySelector('.category-selector.active');
+          if (activeSelector) {
+            activeSelector.classList.add('card-swiping');
+            const moveDistance = Math.min(Math.abs(diffX), 100);
+            const direction = diffX > 0 ? 1 : -1;
+            activeSelector.style.transform = `translateX(${direction * moveDistance * 0.3}px) rotate(${direction * moveDistance * 0.1}deg) translateY(0px) scale(1)`;
+          }
         }
       }, { passive: false });
 
@@ -424,9 +437,12 @@
         const diffX = startX - endX;
         const diffY = Math.abs(startY - endY);
         
-        // 重置卡片位置
-        topicCardElement.classList.remove('card-swiping');
-        topicCardElement.style.transform = '';
+        // 重置激活卡片位置
+        const activeSelector = document.querySelector('.category-selector.active');
+        if (activeSelector) {
+          activeSelector.classList.remove('card-swiping');
+          activeSelector.style.transform = 'translateY(0px) scale(1)';
+        }
         
         // 检查是否为水平滑动
         if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY && isDragging) {
@@ -459,6 +475,9 @@
       let isMouseDragging = false;
 
       topicCardElement.addEventListener('mousedown', (e) => {
+        const activeSelector = document.querySelector('.category-selector.active');
+        if (!activeSelector) return;
+        
         isMouseDown = true;
         mouseStartX = e.clientX;
         mouseCurrentX = mouseStartX;
@@ -475,11 +494,14 @@
           isMouseDragging = true;
           e.preventDefault();
           
-          // 添加视觉反馈
-          topicCardElement.classList.add('card-swiping');
-          const moveDistance = Math.min(Math.abs(diffX), 100);
-          const direction = diffX > 0 ? 1 : -1;
-          topicCardElement.style.transform = `translateX(${direction * moveDistance * 0.3}px) rotate(${direction * moveDistance * 0.1}deg)`;
+          // 只有激活的卡片跟随鼠标移动
+          const activeSelector = document.querySelector('.category-selector.active');
+          if (activeSelector) {
+            activeSelector.classList.add('card-swiping');
+            const moveDistance = Math.min(Math.abs(diffX), 100);
+            const direction = diffX > 0 ? 1 : -1;
+            activeSelector.style.transform = `translateX(${direction * moveDistance * 0.3}px) rotate(${direction * moveDistance * 0.1}deg) translateY(0px) scale(1)`;
+          }
         }
       });
 
@@ -488,9 +510,12 @@
         
         const diffX = mouseStartX - e.clientX;
         
-        // 重置卡片位置
-        topicCardElement.classList.remove('card-swiping');
-        topicCardElement.style.transform = '';
+        // 重置激活卡片位置
+        const activeSelector = document.querySelector('.category-selector.active');
+        if (activeSelector) {
+          activeSelector.classList.remove('card-swiping');
+          activeSelector.style.transform = 'translateY(0px) scale(1)';
+        }
         
         if (Math.abs(diffX) > 50 && isMouseDragging) {
           hideSwipeHint();
@@ -566,6 +591,11 @@
         updateSwipeIndicator();
         displayNewTopic();
 
+        // 移除所有卡片的active类
+        categorySelectors.forEach(selector => {
+          selector.classList.remove('active');
+        });
+
         const activeSelector = categorySelectors.find(
           (s) => s.dataset.categoryId === newCategoryId
         );
@@ -575,6 +605,7 @@
           .map((id) => categorySelectors.find((s) => s.dataset.categoryId === id));
 
         if (activeSelector) {
+          activeSelector.classList.add('active');
           activeSelector.style.transform = 'translateY(0px) scale(1)';
           activeSelector.style.zIndex = 50;
           activeSelector.style.opacity = 1;
@@ -602,10 +633,14 @@
         window.location.href = 'index.html';
       }
 
-      // 点击分类标签时按顺序切换
+      // 点击分类标签时按顺序切换（只有激活的卡片可以点击）
       categorySelectors.forEach((selector) => {
         selector.addEventListener('click', (e) => {
           e.stopPropagation();
+          
+          // 只有激活的卡片可以响应点击
+          if (!selector.classList.contains('active')) return;
+          
           hideSwipeHint();
           
           // 按顺序切换到下一个分类
