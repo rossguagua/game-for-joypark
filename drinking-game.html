@@ -13,8 +13,8 @@
         justify-content: center;
         align-items: flex-start;
         min-height: 100vh;
-        padding-top: 60px;
-        padding-bottom: 80px;
+        padding-top: 100px;
+        padding-bottom: 120px;
         overflow-x: hidden;
       }
 
@@ -54,63 +54,35 @@
       }
 
       .category-text-part {
+        /* For the text inside the small colored tab part */
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
         line-height: 1.2;
-        height: 100%;
-        width: 100%;
-        text-align: center;
+        height: 100%; /* Ensure it fills the small tab part */
       }
 
       .category-selector {
+        /* These are the individual clickable tabs */
         transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55),
           opacity 0.4s ease-out;
         transform-origin: center top;
         position: absolute;
-        border-radius: 0.75rem;
-        pointer-events: none;
-        overflow: hidden;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      }
-
-      .category-selector.active {
-        pointer-events: auto;
-        z-index: 100 !important;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
-      }
-
-      .category-tab {
-        position: absolute;
-        right: 0;
-        top: 10%;
-        transform: translateY(-25%);
-        width: 128px;
-        height: 32px;
-        border-radius: 8px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 11px;
-        font-weight: 600;
-        text-align: center;
-        line-height: 1.1;
-        padding: 4px 8px;
-        box-sizing: border-box;
+        border-radius: 0.75rem; /* 12px */
+        box-shadow: none;
       }
 
       #topic-card {
+        /* This is the main active card area */
         position: relative;
         padding-top: 80px;
         box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
-          0px 4px 12px rgba(0, 0, 0, 0.25);
-        touch-action: pan-x;
-        transition: transform 0.3s ease;
-        overflow: hidden;
+          0px 4px 12px rgba(0, 0, 0, 0.25); /* Shadow only on the main card */
       }
 
       #category-selectors-container {
+        /* Container for all category tabs */
         position: absolute;
         top: 0;
         left: 0;
@@ -119,98 +91,46 @@
         display: flex;
         justify-content: center;
         align-items: flex-start;
-        overflow: hidden;
       }
 
-      .back-button {
+      .back-button-container {
         position: fixed;
-        bottom: 20px;
-        left: 50%;
-        transform: translateX(-50%);
-        background: rgba(255, 255, 255, 0.15);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        color: white;
-        padding: 12px 24px;
-        border-radius: 25px;
-        font-size: 14px;
-        font-weight: 600;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        transition: all 0.3s ease;
-        cursor: pointer;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(21, 21, 21, 0.95));
+        backdrop-filter: blur(10px);
+        padding: 20px;
         z-index: 100;
       }
 
+      .back-button {
+        width: 100%;
+        max-width: 350px;
+        margin: 0 auto;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        padding: 16px 24px;
+        border-radius: 16px;
+        color: white;
+        font-weight: 600;
+        font-size: 16px;
+      }
+
       .back-button:hover {
-        background: rgba(255, 255, 255, 0.25);
-        transform: translateX(-50%) translateY(-2px);
+        background: rgba(255, 255, 255, 0.15);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
       }
 
       .back-button:active {
-        transform: translateX(-50%) translateY(0);
-      }
-
-      /* Swipe indicator */
-      .swipe-indicator {
-        position: absolute;
-        bottom: 80px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 8px;
-        z-index: 60;
-      }
-
-      .swipe-dot {
-        width: 8px;
-        height: 8px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.3);
-        transition: all 0.3s ease;
-      }
-
-      .swipe-dot.active {
-        background: rgba(255, 255, 255, 0.8);
-        transform: scale(1.2);
-      }
-
-      /* Swipe hint animation */
-      .swipe-hint {
-        position: absolute;
-        top: 50%;
-        right: 20px;
-        transform: translateY(-50%);
-        color: rgba(255, 255, 255, 0.6);
-        font-size: 12px;
-        animation: swipeHint 2s infinite;
-        pointer-events: none;
-        z-index: 70;
-      }
-
-      @keyframes swipeHint {
-        0%, 100% {
-          opacity: 0.6;
-          transform: translateY(-50%) translateX(0);
-        }
-        50% {
-          opacity: 1;
-          transform: translateY(-50%) translateX(-10px);
-        }
-      }
-
-      .swipe-hint.hidden {
-        display: none;
-      }
-
-      /* Card swipe animation */
-      .card-swiping {
-        transition: none !important;
-      }
-
-      /* 确保非激活卡片不会显示在激活卡片前面 */
-      .category-selector:not(.active) {
-        z-index: 10 !important;
+        transform: translateY(0);
       }
     </style>
   </head>
@@ -218,29 +138,22 @@
     <div class="container w-full max-w-[350px] p-4 flex flex-col items-center">
       <div
         id="topic-card"
-        class="w-full h-[450px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
+        class="w-full h-[500px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
       >
         <div id="category-selectors-container">
-          <!-- 按照从前往后的顺序：清汤 → 微辣 → 加麻加辣 → 盲盒 -->
           <div
-            data-category-id="mildmode"
-            class="category-selector active w-[316px] h-[100px]"
-            style="background-color: #c8fd0b"
+            data-category-id="surprise"
+            class="category-selector w-[264px] h-[100px]"
+            style="background-color: #ffc9dc"
           >
-            <div class="category-tab" style="background-color: #2df92a; color: black">
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #f93c7e; color: #2df92a"
+            >
               <div class="category-text-part">
-                <span>清汤 Mild Mode</span>
-              </div>
-            </div>
-          </div>
-          <div
-            data-category-id="ontheedge"
-            class="category-selector w-[296px] h-[100px]"
-            style="background-color: #a0e7e5"
-          >
-            <div class="category-tab" style="background-color: #ffc9dc; color: #560ee6">
-              <div class="category-text-part">
-                <span>微辣 On the Edge</span>
+                <span class="text-xs font-medium font-mi-sans block"
+                  >盲盒 Surprise Me</span
+                >
               </div>
             </div>
           </div>
@@ -249,20 +162,46 @@
             class="category-selector w-[280px] h-[100px]"
             style="background-color: #b8b4ff"
           >
-            <div class="category-tab" style="background-color: #342af6; color: #ff2470">
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #342af6; color: #ff2470"
+            >
               <div class="category-text-part">
-                <span>加麻加辣 Intense</span>
+                <span class="text-xs font-medium font-mi-sans block"
+                  >加麻加辣 Intense</span
+                >
               </div>
             </div>
           </div>
           <div
-            data-category-id="surprise"
-            class="category-selector w-[264px] h-[100px]"
-            style="background-color: #ffc9dc"
+            data-category-id="ontheedge"
+            class="category-selector w-[296px] h-[100px]"
+            style="background-color: #a0e7e5"
           >
-            <div class="category-tab" style="background-color: #f93c7e; color: #2df92a">
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #ffc9dc; color: #560ee6"
+            >
               <div class="category-text-part">
-                <span>盲盒 Surprise Me</span>
+                <span class="text-xs font-medium font-mi-sans block"
+                  >微辣 On the Edge</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            data-category-id="mildmode"
+            class="category-selector w-[316px] h-[100px]"
+            style="background-color: #c8fd0b"
+          >
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #2df92a; color: black"
+            >
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >清汤 Mild Mode</span
+                >
               </div>
             </div>
           </div>
@@ -296,33 +235,23 @@
             />
           </svg>
         </button>
-
-        <!-- Swipe hint -->
-        <div id="swipe-hint" class="swipe-hint">
-          ← 滑动切换 →
-        </div>
-      </div>
-
-      <!-- Swipe indicator dots -->
-      <div class="swipe-indicator">
-        <div class="swipe-dot active" data-category="mildmode"></div>
-        <div class="swipe-dot" data-category="ontheedge"></div>
-        <div class="swipe-dot" data-category="intense"></div>
-        <div class="swipe-dot" data-category="surprise"></div>
       </div>
     </div>
 
-    <!-- Simple Back Button -->
-    <button onclick="goBack()" class="back-button">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-      </svg>
-      返回游戏库
-    </button>
+    <!-- Back Button Container -->
+    <div class="back-button-container">
+      <button onclick="goBack()" class="back-button">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+        </svg>
+        返回游戏库
+      </button>
+    </div>
 
     <script>
-      let topicsData = {};
+      let topicsData = {}; // 初始化为一个空对象
 
+      // 从 JSON 文件中获取话题数据
       fetch('topics.json')
         .then((response) => {
           if (!response.ok) {
@@ -331,7 +260,8 @@
           return response.json();
         })
         .then((data) => {
-          topicsData = data;
+          topicsData = data; // 将获取到的数据赋值给 topicsData
+          // 数据加载完成后，再进行初始化
           setActiveCategory(currentCategoryId);
         })
         .catch((error) => {
@@ -348,12 +278,7 @@
       const categorySelectors = Array.from(
         document.querySelectorAll('.category-selector')
       );
-      const swipeHint = document.getElementById('swipe-hint');
 
-      // 正确的从前往后顺序：清汤 → 微辣 → 加麻加辣 → 盲盒
-      const categoryOrder = ['mildmode', 'ontheedge', 'intense', 'surprise'];
-      
-      // 视觉堆叠顺序（从后往前）：盲盒 → 加麻加辣 → 微辣 → 清汤（最前面）
       const categoryVisualOrder = ['surprise', 'intense', 'ontheedge', 'mildmode'];
 
       const initialTabPositions = {
@@ -366,194 +291,6 @@
       categorySelectors.forEach((sel) => {
         const id = sel.dataset.categoryId;
         sel.style.left = initialTabPositions[id].left;
-      });
-
-      // Swipe functionality with visual feedback
-      let startX = 0;
-      let startY = 0;
-      let currentX = 0;
-      let isSwipeStarted = false;
-      let hasInteracted = false;
-      let isDragging = false;
-
-      function updateSwipeIndicator() {
-        const dots = document.querySelectorAll('.swipe-dot');
-        dots.forEach(dot => {
-          if (dot.dataset.category === currentCategoryId) {
-            dot.classList.add('active');
-          } else {
-            dot.classList.remove('active');
-          }
-        });
-      }
-
-      function hideSwipeHint() {
-        if (!hasInteracted) {
-          hasInteracted = true;
-          swipeHint.classList.add('hidden');
-        }
-      }
-
-      function getNextCategory(direction) {
-        const currentIndex = categoryOrder.indexOf(currentCategoryId);
-        let newIndex;
-        
-        if (direction === 'next') {
-          // 向前：清汤 → 微辣 → 加麻加辣 → 盲盒 → 清汤
-          newIndex = (currentIndex + 1) % categoryOrder.length;
-        } else {
-          // 向后：盲盒 → 加麻加辣 → 微辣 → 清汤 → 盲盒
-          newIndex = (currentIndex - 1 + categoryOrder.length) % categoryOrder.length;
-        }
-        
-        return categoryOrder[newIndex];
-      }
-
-      // 只有第一张卡片（激活的卡片）可以滑动
-      topicCardElement.addEventListener('touchstart', (e) => {
-        // 检查是否点击在激活的卡片上
-        const activeSelector = document.querySelector('.category-selector.active');
-        if (!activeSelector) return;
-        
-        startX = e.touches[0].clientX;
-        startY = e.touches[0].clientY;
-        currentX = startX;
-        isSwipeStarted = true;
-        isDragging = false;
-      }, { passive: true });
-
-      topicCardElement.addEventListener('touchmove', (e) => {
-        if (!isSwipeStarted) return;
-        
-        currentX = e.touches[0].clientX;
-        const currentY = e.touches[0].clientY;
-        const diffX = currentX - startX;
-        const diffY = Math.abs(currentY - startY);
-        
-        // 如果水平滑动距离大于垂直滑动距离，则认为是水平滑动
-        if (Math.abs(diffX) > diffY && Math.abs(diffX) > 10) {
-          isDragging = true;
-          e.preventDefault();
-          
-          // 只有激活的卡片跟随手指移动，限制移动范围防止穿模
-          const activeSelector = document.querySelector('.category-selector.active');
-          if (activeSelector) {
-            activeSelector.classList.add('card-swiping');
-            const moveDistance = Math.min(Math.abs(diffX), 60); // 进一步减少移动距离
-            const direction = diffX > 0 ? 1 : -1;
-            const rotation = Math.min(moveDistance * 0.03, 2); // 进一步减少旋转角度
-            activeSelector.style.transform = `translateX(${direction * moveDistance * 0.15}px) rotate(${direction * rotation}deg) translateY(0px) scale(1)`;
-          }
-        }
-      }, { passive: false });
-
-      topicCardElement.addEventListener('touchend', (e) => {
-        if (!isSwipeStarted) return;
-        
-        const endX = e.changedTouches[0].clientX;
-        const endY = e.changedTouches[0].clientY;
-        const diffX = startX - endX;
-        const diffY = Math.abs(startY - endY);
-        
-        // 重置激活卡片位置
-        const activeSelector = document.querySelector('.category-selector.active');
-        if (activeSelector) {
-          activeSelector.classList.remove('card-swiping');
-          activeSelector.style.transform = 'translateY(0px) scale(1)';
-        }
-        
-        // 检查是否为水平滑动
-        if (Math.abs(diffX) > 50 && Math.abs(diffX) > diffY && isDragging) {
-          hideSwipeHint();
-          
-          let nextCategory;
-          if (diffX > 0) {
-            // 向左滑动 - 下一个分类（从前往后）
-            nextCategory = getNextCategory('next');
-          } else {
-            // 向右滑动 - 上一个分类（从后往前）
-            nextCategory = getNextCategory('prev');
-          }
-          
-          setActiveCategory(nextCategory);
-        } else if (Math.abs(diffX) < 10 && diffY < 10 && !isDragging) {
-          // 点击事件
-          hideSwipeHint();
-          displayNewTopic();
-        }
-        
-        isSwipeStarted = false;
-        isDragging = false;
-      }, { passive: true });
-
-      // Mouse events for desktop testing
-      let isMouseDown = false;
-      let mouseStartX = 0;
-      let mouseCurrentX = 0;
-      let isMouseDragging = false;
-
-      topicCardElement.addEventListener('mousedown', (e) => {
-        const activeSelector = document.querySelector('.category-selector.active');
-        if (!activeSelector) return;
-        
-        isMouseDown = true;
-        mouseStartX = e.clientX;
-        mouseCurrentX = mouseStartX;
-        isMouseDragging = false;
-      });
-
-      topicCardElement.addEventListener('mousemove', (e) => {
-        if (!isMouseDown) return;
-        
-        mouseCurrentX = e.clientX;
-        const diffX = mouseCurrentX - mouseStartX;
-        
-        if (Math.abs(diffX) > 10) {
-          isMouseDragging = true;
-          e.preventDefault();
-          
-          // 只有激活的卡片跟随鼠标移动，限制移动范围
-          const activeSelector = document.querySelector('.category-selector.active');
-          if (activeSelector) {
-            activeSelector.classList.add('card-swiping');
-            const moveDistance = Math.min(Math.abs(diffX), 60);
-            const direction = diffX > 0 ? 1 : -1;
-            const rotation = Math.min(moveDistance * 0.03, 2);
-            activeSelector.style.transform = `translateX(${direction * moveDistance * 0.15}px) rotate(${direction * rotation}deg) translateY(0px) scale(1)`;
-          }
-        }
-      });
-
-      topicCardElement.addEventListener('mouseup', (e) => {
-        if (!isMouseDown) return;
-        
-        const diffX = mouseStartX - e.clientX;
-        
-        // 重置激活卡片位置
-        const activeSelector = document.querySelector('.category-selector.active');
-        if (activeSelector) {
-          activeSelector.classList.remove('card-swiping');
-          activeSelector.style.transform = 'translateY(0px) scale(1)';
-        }
-        
-        if (Math.abs(diffX) > 50 && isMouseDragging) {
-          hideSwipeHint();
-          
-          let nextCategory;
-          if (diffX > 0) {
-            nextCategory = getNextCategory('next');
-          } else {
-            nextCategory = getNextCategory('prev');
-          }
-          
-          setActiveCategory(nextCategory);
-        } else if (Math.abs(diffX) < 10 && !isMouseDragging) {
-          hideSwipeHint();
-          displayNewTopic();
-        }
-        
-        isMouseDown = false;
-        isMouseDragging = false;
       });
 
       function getRandomTopic(questions) {
@@ -605,15 +342,9 @@
 
       function setActiveCategory(newCategoryId) {
         currentCategoryId = newCategoryId;
-        lastTopicIndex = -1;
+        lastTopicIndex = -1; // 切换分类时重置 lastTopicIndex
         updateTopicCardUnifiedStyle();
-        updateSwipeIndicator();
         displayNewTopic();
-
-        // 移除所有卡片的active类
-        categorySelectors.forEach(selector => {
-          selector.classList.remove('active');
-        });
 
         const activeSelector = categorySelectors.find(
           (s) => s.dataset.categoryId === newCategoryId
@@ -623,26 +354,29 @@
           .filter((id) => id !== newCategoryId)
           .map((id) => categorySelectors.find((s) => s.dataset.categoryId === id));
 
+        // 激活卡片的样式
         if (activeSelector) {
-          activeSelector.classList.add('active');
           activeSelector.style.transform = 'translateY(0px) scale(1)';
-          activeSelector.style.zIndex = 100;
+          activeSelector.style.zIndex = 50;
           activeSelector.style.opacity = 1;
+          activeSelector.style.boxShadow = 'none'; // 移除激活标签的阴影
         }
 
-        // 设置非激活卡片的层级，确保它们在激活卡片下方
+        // 非激活卡片的堆叠样式
         inactiveSelectorsOrdered.forEach((selector, index) => {
           if (selector) {
             const depth = index + 1;
-            const translateYFactor = -20; // 进一步减少间距防止穿模
-            const scaleFactor = 0.06; // 进一步减少缩放差异
-            const opacityFactor = 0.2; // 增加透明度差异
+            // 可修改的堆叠效果变量：
+            const translateYFactor = -30; // 负值越大，间距越大
+            const scaleFactor = 0.1; // 值越大，每层收缩越多
+            const opacityFactor = 0.1; // 值越大，每层透明度降低越多
 
             selector.style.transform = `translateY(${
               depth * translateYFactor
             }px) scale(${1 - depth * scaleFactor})`;
-            selector.style.zIndex = 50 - depth * 10; // 确保都在激活卡片下方
-            selector.style.opacity = Math.max(0.3, 1 - depth * opacityFactor);
+            selector.style.zIndex = 40 - depth * 10;
+            selector.style.opacity = Math.max(0, 1 - depth * opacityFactor);
+            selector.style.boxShadow = 'none'; // 移除非激活标签的阴影
           }
         });
       }
@@ -651,34 +385,24 @@
         window.location.href = 'index.html';
       }
 
-      // 点击分类标签时按顺序切换（只有激活的卡片可以点击）
-      categorySelectors.forEach((selector) => {
-        selector.addEventListener('click', (e) => {
-          e.stopPropagation();
-          
-          // 只有激活的卡片可以响应点击
-          if (!selector.classList.contains('active')) return;
-          
-          hideSwipeHint();
-          
-          // 按顺序切换到下一个分类
-          const nextCategory = getNextCategory('next');
-          setActiveCategory(nextCategory);
-        });
+      topicCardElement.addEventListener('click', (e) => {
+        if (e.target.closest('.category-selector')) {
+          return;
+        }
+        displayNewTopic();
       });
 
       refreshButton.addEventListener('click', (e) => {
         e.stopPropagation();
-        hideSwipeHint();
         displayNewTopic();
       });
 
-      // Hide swipe hint after 5 seconds
-      setTimeout(() => {
-        if (!hasInteracted) {
-          swipeHint.classList.add('hidden');
-        }
-      }, 5000);
+      categorySelectors.forEach((selector) => {
+        selector.addEventListener('click', (e) => {
+          e.stopPropagation();
+          setActiveCategory(selector.dataset.categoryId);
+        });
+      });
     </script>
   </body>
 </html>
