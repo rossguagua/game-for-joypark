@@ -275,10 +275,47 @@
         font-weight: 600;
         z-index: 10;
       }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .error-message {
+        color: #ff6b6b;
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 12px;
+        margin: 20px;
+      }
     </style>
   </head>
   <body class="bg-[#151515] text-white">
-    <div class="container w-full max-w-[350px] p-4 flex flex-col items-center">
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-8">
+      <div class="loading-spinner mx-auto mb-4"></div>
+      <p class="text-gray-400">正在加载游戏数据...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-message" style="display: none;">
+      <p class="mb-4">加载游戏数据失败</p>
+      <button onclick="location.reload()" class="bg-red-500 text-white px-4 py-2 rounded">重试</button>
+    </div>
+
+    <!-- Game Container -->
+    <div id="gameContainer" class="container w-full max-w-[350px] p-4 flex flex-col items-center" style="display: none;">
       <div
         id="topic-card"
         class="w-full h-[500px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
@@ -430,7 +467,9 @@
       返回游戏库
     </button>
 
-    <script>
+    <script type="module">
+      import { getCardsByCategory } from './src/lib/supabase.js'
+
       let topicsData = {};
       let availableCards = {}; // Store available cards for each category
       let usedCards = {}; // Store used cards for each category
@@ -453,6 +492,25 @@
         'mildmode': '清汤 Mild Mode'
       };
 
+      const categoryColors = {
+        'surprise': {
+          mainCardColor: 'bg-[#FFC9DC]',
+          mainCardTextColor: 'text-black'
+        },
+        'intense': {
+          mainCardColor: 'bg-[#B8B4FF]',
+          mainCardTextColor: 'text-black'
+        },
+        'ontheedge': {
+          mainCardColor: 'bg-[#A0E7E5]',
+          mainCardTextColor: 'text-black'
+        },
+        'mildmode': {
+          mainCardColor: 'bg-[#C8FD0B]',
+          mainCardTextColor: 'text-black'
+        }
+      };
+
       const initialTabPositions = {
         surprise: { left: 'calc(50% - 132px)' },
         intense: { left: 'calc(50% - 140px)' },
@@ -465,25 +523,42 @@
         sel.style.left = initialTabPositions[id].left;
       });
 
-      // 从 JSON 文件中获取话题数据
-      fetch('topics.json')
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+      // 从数据库加载话题数据
+      async function loadTopicsData() {
+        try {
+          console.log('Loading topics data from database...');
+          
+          // 加载所有分类的卡片
+          for (const categoryId of Object.keys(categoryNames)) {
+            console.log(`Loading cards for category: ${categoryId}`);
+            const cards = await getCardsByCategory('drinking-topics', categoryId);
+            console.log(`Loaded ${cards.length} cards for ${categoryId}:`, cards);
+            
+            topicsData[categoryId] = {
+              id: categoryId,
+              ...categoryColors[categoryId],
+              questions: cards.map(card => card.content)
+            };
           }
-          return response.json();
-        })
-        .then((data) => {
-          topicsData = data;
-          // Initialize available cards for each category
+
+          console.log('All topics data loaded:', topicsData);
+          
+          // 初始化可用卡片
           initializeAvailableCards();
-          // 数据加载完成后，再进行初始化
+          
+          // 隐藏加载状态，显示游戏
+          document.getElementById('loadingState').style.display = 'none';
+          document.getElementById('gameContainer').style.display = 'flex';
+          
+          // 设置初始分类
           setActiveCategory(currentCategoryId);
-        })
-        .catch((error) => {
-          console.error('Error fetching topics:', error);
-          topicTextElement.textContent = '加载话题失败，请稍后再试。';
-        });
+          
+        } catch (error) {
+          console.error('Error loading topics data:', error);
+          document.getElementById('loadingState').style.display = 'none';
+          document.getElementById('errorState').style.display = 'block';
+        }
+      }
 
       function initializeAvailableCards() {
         for (const categoryId in topicsData) {
@@ -564,13 +639,13 @@
         document.body.style.overflow = 'hidden';
       }
 
-      function closeCompletionModal() {
+      window.closeCompletionModal = function() {
         const modal = document.getElementById('completionModal');
         modal.classList.remove('active');
         document.body.style.overflow = '';
       }
 
-      function restartCategory() {
+      window.restartCategory = function() {
         resetCategoryCards(currentCategoryId);
         updateProgressIndicator();
         closeCompletionModal();
@@ -653,7 +728,7 @@
         });
       }
 
-      function goBack() {
+      window.goBack = function() {
         window.location.href = 'index.html';
       }
 
@@ -689,6 +764,9 @@
           closeCompletionModal();
         }
       });
+
+      // 初始化应用
+      loadTopicsData();
     </script>
   </body>
 </html>

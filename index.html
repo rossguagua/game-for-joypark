@@ -411,6 +411,20 @@
             font-weight: 600;
             margin-left: 8px;
         }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-[#151515] text-white">
@@ -493,128 +507,145 @@
             <img src="images/jiubao-park-logo.png/image.png" alt="酒宝公园" class="logo-image">
         </div>
 
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-8">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-400">正在加载游戏...</p>
+        </div>
+
         <!-- Main Game Section -->
-        <div class="main-game-section">
-            <div class="game-card" onclick="showGamePreview('drinking-topics')">
-                <div class="main-game-card main-game-fallback">
-                    <div class="main-game-title">聊天破冰盲盒</div>
-                    <div class="main-game-subtitle">每句话都是命运的🎲 用盲盒话题开启今晚</div>
-                </div>
-            </div>
+        <div id="mainGameSection" class="main-game-section" style="display: none;">
+            <!-- Main game will be populated here -->
         </div>
 
         <!-- Game Grid -->
-        <div class="game-grid">
-            <!-- 得吃大逃杀 -->
-            <div class="game-card coming-soon" onclick="showGamePreview('battle-royale')">
-                <div class="game-card-content game-1">
-                    <!-- Image background is set via CSS -->
-                </div>
-            </div>
-
-            <!-- 二本吻痕 -->
-            <div class="game-card coming-soon" onclick="showGamePreview('kiss-marks')">
-                <div class="game-card-content game-2">
-                    <!-- Image background is set via CSS -->
-                </div>
-            </div>
-
-            <!-- 派对心理学 -->
-            <div class="game-card coming-soon" onclick="showGamePreview('party-psychology')">
-                <div class="game-card-content game-3">
-                    <!-- Image background is set via CSS -->
-                </div>
-            </div>
-
-            <!-- 酒宝急生智 -->
-            <div class="game-card coming-soon" onclick="showGamePreview('wisdom')">
-                <div class="game-card-content game-4">
-                    <!-- Image background is set via CSS -->
-                </div>
-            </div>
-
-            <!-- 满地飘零 -->
-            <div class="game-card coming-soon" onclick="showGamePreview('man-di-piao-ling')">
-                <div class="game-card-content game-5">
-                    <!-- Image background is set via CSS -->
-                </div>
-            </div>
-
-            <!-- 酒宝月圆夜 -->
-            <div class="game-card coming-soon" onclick="showGamePreview('moon-night')">
-                <div class="game-card-content game-6">
-                    <div class="game-text-overlay">
-                        <div class="game-title">酒宝月圆夜</div>
-                        <div class="game-subtitle">狼人杀</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- 纯爱大作战 -->
-            <div class="game-card coming-soon" onclick="showGamePreview('love-battle')">
-                <div class="game-card-content game-7">
-                    <!-- Image background is set via CSS -->
-                </div>
-            </div>
-
-            <!-- 德州扑克牌 -->
-            <div class="game-card coming-soon" onclick="showGamePreview('poker')">
-                <div class="game-card-content game-8">
-                    <!-- Image background is set via CSS -->
-                </div>
-            </div>
+        <div id="gameGrid" class="game-grid" style="display: none;">
+            <!-- Other games will be populated here -->
         </div>
     </div>
 
-    <script>
-        let gamesData = {};
+    <script type="module">
+        import { getGames } from './src/lib/supabase.js'
+
+        let gamesData = [];
         let selectedGameId = null;
 
-        // Load games data
-        fetch('games.json')
-            .then(response => response.json())
-            .then(data => {
-                gamesData = data;
-                console.log('Games data loaded:', gamesData);
-            })
-            .catch(error => {
-                console.error('Error loading games data:', error);
-            });
+        // 游戏背景图片映射
+        const gameBackgrounds = {
+            'battle-royale': 'images/eat-chicken-battle-royale.png/image.png',
+            'kiss-marks': 'images/second-kiss-mark.png/image.png',
+            'party-psychology': 'images/party-psychology.png/image.png',
+            'wisdom': 'images/jiubao-quick-wit.png/image.png',
+            'man-di-piao-ling': 'images/man-di-piao-ling.png/image.png',
+            'moon-night': 'images/jiubao-yuanyue-ye/image.png',
+            'love-battle': 'images/chun-ai-da-zuo-zhan.png/image.png',
+            'poker': 'images/de-zhou-pu-ke-pai.png/image.png'
+        };
 
-        function showGamePreview(gameId) {
-            console.log('Showing preview for game:', gameId);
-            selectedGameId = gameId;
-            const game = gamesData[gameId];
+        // 加载游戏数据
+        async function loadGames() {
+            try {
+                console.log('Loading games from database...');
+                const games = await getGames();
+                console.log('Games loaded:', games);
+                gamesData = games;
+                renderGames();
+            } catch (error) {
+                console.error('Error loading games:', error);
+                document.getElementById('loadingState').innerHTML = `
+                    <div class="text-center py-8">
+                        <p class="text-red-400 mb-4">加载游戏失败</p>
+                        <button onclick="location.reload()" class="bg-red-500 text-white px-4 py-2 rounded">重试</button>
+                    </div>
+                `;
+            }
+        }
+
+        // 渲染游戏列表
+        function renderGames() {
+            const loadingState = document.getElementById('loadingState');
+            const mainGameSection = document.getElementById('mainGameSection');
+            const gameGrid = document.getElementById('gameGrid');
+
+            // 隐藏加载状态
+            loadingState.style.display = 'none';
+
+            // 找到主要游戏（聊天破冰盲盒）
+            const mainGame = gamesData.find(game => game.category_tag === 'drinking-topics');
+            if (mainGame) {
+                mainGameSection.innerHTML = `
+                    <div class="game-card" onclick="showGamePreview('${mainGame.category_tag}')">
+                        <div class="main-game-card main-game-fallback">
+                            <div class="main-game-title">${mainGame.name}</div>
+                            <div class="main-game-subtitle">${mainGame.description}</div>
+                        </div>
+                    </div>
+                `;
+                mainGameSection.style.display = 'block';
+            }
+
+            // 渲染其他游戏
+            const otherGames = gamesData.filter(game => game.category_tag !== 'drinking-topics');
+            gameGrid.innerHTML = otherGames.map(game => {
+                const backgroundImage = gameBackgrounds[game.category_tag];
+                const isComingSoon = game.category_tag !== 'drinking-topics';
+                
+                return `
+                    <div class="game-card ${isComingSoon ? 'coming-soon' : ''}" onclick="showGamePreview('${game.category_tag}')">
+                        <div class="game-card-content" style="${backgroundImage ? `background-image: url('${backgroundImage}')` : 'background: linear-gradient(135deg, #666 0%, #333 100%)'}">
+                            <!-- Image background is set via style -->
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            gameGrid.style.display = 'grid';
+        }
+
+        // 显示游戏预览
+        window.showGamePreview = function(categoryTag) {
+            console.log('Showing preview for game:', categoryTag);
+            selectedGameId = categoryTag;
+            const game = gamesData.find(g => g.category_tag === categoryTag);
             
             if (!game) {
-                console.error('Game not found:', gameId);
+                console.error('Game not found:', categoryTag);
                 return;
             }
 
-            // Populate modal content
+            // 填充模态框内容
             document.getElementById('modalTitle').textContent = game.name;
-            document.getElementById('modalDescription').textContent = game.description;
-            document.getElementById('modalPlayers').textContent = game.players;
-            document.getElementById('modalDuration').textContent = game.duration;
+            document.getElementById('modalDescription').textContent = game.description || '';
+            document.getElementById('modalPlayers').textContent = game.players || '未知';
+            document.getElementById('modalDuration').textContent = game.duration || '未知';
 
-            // Populate features
+            // 填充特色标签
             const featuresContainer = document.getElementById('modalFeatures');
             featuresContainer.innerHTML = '';
-            game.features.forEach(feature => {
-                const tag = document.createElement('span');
-                tag.className = 'feature-tag';
-                tag.textContent = feature;
-                featuresContainer.appendChild(tag);
-            });
+            if (game.features && Array.isArray(game.features)) {
+                game.features.forEach(feature => {
+                    const tag = document.createElement('span');
+                    tag.className = 'feature-tag';
+                    tag.textContent = feature;
+                    featuresContainer.appendChild(tag);
+                });
+            }
 
-            // Update start button based on availability
+            // 更新开始按钮
             const startBtn = document.getElementById('startGameBtn');
-            const isComingSoon = gameId !== 'drinking-topics';
+            const isAvailable = categoryTag === 'drinking-topics';
             
-            if (isComingSoon) {
+            if (isAvailable) {
+                startBtn.textContent = '开始游戏';
+                startBtn.disabled = false;
+                // 移除即将推出标签
+                const badge = document.getElementById('modalTitle').querySelector('.coming-soon-badge');
+                if (badge) {
+                    badge.remove();
+                }
+            } else {
                 startBtn.textContent = '即将推出';
                 startBtn.disabled = true;
-                // Add coming soon badge to title
+                // 添加即将推出标签
                 const titleElement = document.getElementById('modalTitle');
                 if (!titleElement.querySelector('.coming-soon-badge')) {
                     const badge = document.createElement('span');
@@ -622,34 +653,24 @@
                     badge.textContent = '即将推出';
                     titleElement.appendChild(badge);
                 }
-            } else {
-                startBtn.textContent = '开始游戏';
-                startBtn.disabled = false;
-                // Remove coming soon badge if exists
-                const badge = document.getElementById('modalTitle').querySelector('.coming-soon-badge');
-                if (badge) {
-                    badge.remove();
-                }
             }
 
-            // Show modal
+            // 显示模态框
             const modal = document.getElementById('gameModal');
             modal.classList.add('active');
-            
-            // Prevent body scroll
             document.body.style.overflow = 'hidden';
         }
 
-        function closeModal() {
+        // 关闭模态框
+        window.closeModal = function() {
             const modal = document.getElementById('gameModal');
             modal.classList.remove('active');
             selectedGameId = null;
-            
-            // Restore body scroll
             document.body.style.overflow = '';
         }
 
-        function startSelectedGame() {
+        // 开始选中的游戏
+        window.startSelectedGame = function() {
             console.log('Starting game:', selectedGameId);
             
             if (!selectedGameId) {
@@ -657,35 +678,32 @@
                 return;
             }
             
-            // Only proceed if it's the drinking-topics game
+            // 只有聊天破冰盲盒可以启动
             if (selectedGameId === 'drinking-topics') {
                 console.log('Navigating to drinking-game.html');
                 closeModal();
                 window.location.href = 'drinking-game.html';
             } else {
                 console.log('Game is coming soon, not navigating');
-                // For coming soon games, we don't navigate anywhere
-                // The button should be disabled anyway
             }
         }
 
-        // Close modal when clicking outside
+        // 点击模态框外部关闭
         document.getElementById('gameModal').addEventListener('click', function(e) {
             if (e.target === this) {
                 closeModal();
             }
         });
 
-        // Close modal with Escape key
+        // ESC键关闭模态框
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeModal();
             }
         });
 
-        // Add smooth scrolling behavior
+        // 触摸反馈
         document.addEventListener('DOMContentLoaded', function() {
-            // Add touch feedback for mobile
             const gameCards = document.querySelectorAll('.game-card');
             gameCards.forEach(card => {
                 card.addEventListener('touchstart', function() {
@@ -697,6 +715,9 @@
                 });
             });
         });
+
+        // 初始化应用
+        loadGames();
     </script>
 </body>
 </html>
