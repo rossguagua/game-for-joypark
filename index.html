@@ -212,6 +212,178 @@
             opacity: 0.9;
             font-weight: 500;
         }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 32px 24px;
+            max-width: 340px;
+            width: 100%;
+            color: #151515;
+            position: relative;
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(0, 0, 0, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .modal-close:hover {
+            background: rgba(0, 0, 0, 0.2);
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: #151515;
+        }
+
+        .modal-description {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-features {
+            margin-bottom: 20px;
+        }
+
+        .modal-features h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: #151515;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .feature-tag {
+            background: rgba(255, 107, 107, 0.1);
+            color: #ff6b6b;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .modal-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 12px;
+            background: rgba(0, 0, 0, 0.05);
+            border-radius: 12px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: #151515;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-start {
+            flex: 1;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-start:active {
+            transform: translateY(0);
+        }
+
+        .btn-start:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .coming-soon-badge {
+            display: inline-block;
+            background: rgba(255, 193, 7, 0.2);
+            color: #ff8c00;
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body class="bg-[#151515] text-white">
@@ -242,6 +414,45 @@
         </div>
     </div>
 
+    <!-- Game Preview Modal -->
+    <div id="gameModal" class="modal-overlay">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            
+            <div id="modalTitle" class="modal-title">游戏标题</div>
+            <div id="modalDescription" class="modal-description">游戏描述</div>
+            
+            <div class="modal-features">
+                <h4>游戏特色</h4>
+                <div id="modalFeatures" class="feature-tags">
+                    <!-- Features will be populated here -->
+                </div>
+            </div>
+            
+            <div class="modal-info">
+                <div class="info-item">
+                    <div class="info-label">适合人数</div>
+                    <div id="modalPlayers" class="info-value">2-8人</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">游戏时长</div>
+                    <div id="modalDuration" class="info-value">15-30分钟</div>
+                </div>
+            </div>
+            
+            <div class="modal-buttons">
+                <button id="startGameBtn" class="btn-start" onclick="startSelectedGame()">
+                    开始游戏
+                </button>
+            </div>
+        </div>
+    </div>
+
     <!-- Main Content Container -->
     <div class="main-container">
         <!-- Logo Section -->
@@ -251,7 +462,7 @@
 
         <!-- Main Game Section -->
         <div class="main-game-section">
-            <div class="game-card" onclick="openGame('drinking-topics')">
+            <div class="game-card" onclick="showGamePreview('drinking-topics')">
                 <div class="main-game-card main-game-fallback">
                     <div class="main-game-title">聊天破冰盲盒</div>
                     <div class="main-game-subtitle">每句话都是命运的🎲 用盲盒话题开启今晚</div>
@@ -262,42 +473,42 @@
         <!-- Game Grid -->
         <div class="game-grid">
             <!-- 得吃大逃杀 -->
-            <div class="game-card coming-soon" onclick="openGame('battle-royale')">
+            <div class="game-card coming-soon" onclick="showGamePreview('battle-royale')">
                 <div class="game-card-content game-1">
                     <!-- Image background is set via CSS -->
                 </div>
             </div>
 
             <!-- 二本吻痕 -->
-            <div class="game-card coming-soon" onclick="openGame('kiss-marks')">
+            <div class="game-card coming-soon" onclick="showGamePreview('kiss-marks')">
                 <div class="game-card-content game-2">
                     <!-- Image background is set via CSS -->
                 </div>
             </div>
 
             <!-- 派对心理学 -->
-            <div class="game-card coming-soon" onclick="openGame('party-psychology')">
+            <div class="game-card coming-soon" onclick="showGamePreview('party-psychology')">
                 <div class="game-card-content game-3">
                     <!-- Image background is set via CSS -->
                 </div>
             </div>
 
             <!-- 酒宝急生智 -->
-            <div class="game-card coming-soon" onclick="openGame('wisdom')">
+            <div class="game-card coming-soon" onclick="showGamePreview('wisdom')">
                 <div class="game-card-content game-4">
                     <!-- Image background is set via CSS -->
                 </div>
             </div>
 
             <!-- 满地飘零 -->
-            <div class="game-card coming-soon" onclick="openGame('man-di-piao-ling')">
+            <div class="game-card coming-soon" onclick="showGamePreview('man-di-piao-ling')">
                 <div class="game-card-content game-5">
                     <!-- Image background is set via CSS -->
                 </div>
             </div>
 
             <!-- 酒宝月圆夜 -->
-            <div class="game-card coming-soon" onclick="openGame('moon-night')">
+            <div class="game-card coming-soon" onclick="showGamePreview('moon-night')">
                 <div class="game-card-content game-6">
                     <div class="game-text-overlay">
                         <div class="game-title">酒宝月圆夜</div>
@@ -307,14 +518,14 @@
             </div>
 
             <!-- 纯爱大作战 -->
-            <div class="game-card coming-soon" onclick="openGame('love-battle')">
+            <div class="game-card coming-soon" onclick="showGamePreview('love-battle')">
                 <div class="game-card-content game-7">
                     <!-- Image background is set via CSS -->
                 </div>
             </div>
 
             <!-- 德州扑克牌 -->
-            <div class="game-card coming-soon" onclick="openGame('poker')">
+            <div class="game-card coming-soon" onclick="showGamePreview('poker')">
                 <div class="game-card-content game-8">
                     <!-- Image background is set via CSS -->
                 </div>
@@ -323,40 +534,115 @@
     </div>
 
     <script>
-        function openGame(gameId) {
-            switch(gameId) {
+        let gamesData = {};
+        let selectedGameId = null;
+
+        // Load games data
+        fetch('games.json')
+            .then(response => response.json())
+            .then(data => {
+                gamesData = data;
+            })
+            .catch(error => {
+                console.error('Error loading games data:', error);
+            });
+
+        function showGamePreview(gameId) {
+            selectedGameId = gameId;
+            const game = gamesData[gameId];
+            
+            if (!game) {
+                console.error('Game not found:', gameId);
+                return;
+            }
+
+            // Populate modal content
+            document.getElementById('modalTitle').textContent = game.name;
+            document.getElementById('modalDescription').textContent = game.description;
+            document.getElementById('modalPlayers').textContent = game.players;
+            document.getElementById('modalDuration').textContent = game.duration;
+
+            // Populate features
+            const featuresContainer = document.getElementById('modalFeatures');
+            featuresContainer.innerHTML = '';
+            game.features.forEach(feature => {
+                const tag = document.createElement('span');
+                tag.className = 'feature-tag';
+                tag.textContent = feature;
+                featuresContainer.appendChild(tag);
+            });
+
+            // Update start button based on availability
+            const startBtn = document.getElementById('startGameBtn');
+            const isComingSoon = gameId !== 'drinking-topics';
+            
+            if (isComingSoon) {
+                startBtn.textContent = '即将推出';
+                startBtn.disabled = true;
+                // Add coming soon badge to title
+                const titleElement = document.getElementById('modalTitle');
+                if (!titleElement.querySelector('.coming-soon-badge')) {
+                    const badge = document.createElement('span');
+                    badge.className = 'coming-soon-badge';
+                    badge.textContent = '即将推出';
+                    titleElement.appendChild(badge);
+                }
+            } else {
+                startBtn.textContent = '开始游戏';
+                startBtn.disabled = false;
+                // Remove coming soon badge if exists
+                const badge = document.getElementById('modalTitle').querySelector('.coming-soon-badge');
+                if (badge) {
+                    badge.remove();
+                }
+            }
+
+            // Show modal
+            const modal = document.getElementById('gameModal');
+            modal.classList.add('active');
+            
+            // Prevent body scroll
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('gameModal');
+            modal.classList.remove('active');
+            selectedGameId = null;
+            
+            // Restore body scroll
+            document.body.style.overflow = '';
+        }
+
+        function startSelectedGame() {
+            if (!selectedGameId) return;
+            
+            closeModal();
+            
+            // Navigate to game
+            switch(selectedGameId) {
                 case 'drinking-topics':
-                    // Navigate to the drinking topics game
                     window.location.href = 'drinking-game.html';
                     break;
-                case 'party-psychology':
-                    window.location.href = 'coming-soon.html?game=party-psychology';
-                    break;
-                case 'battle-royale':
-                    window.location.href = 'coming-soon.html?game=battle-royale';
-                    break;
-                case 'kiss-marks':
-                    window.location.href = 'coming-soon.html?game=kiss-marks';
-                    break;
-                case 'wisdom':
-                    window.location.href = 'coming-soon.html?game=wisdom';
-                    break;
-                case 'man-di-piao-ling':
-                    window.location.href = 'coming-soon.html?game=man-di-piao-ling';
-                    break;
-                case 'moon-night':
-                    window.location.href = 'coming-soon.html?game=moon-night';
-                    break;
-                case 'love-battle':
-                    window.location.href = 'coming-soon.html?game=love-battle';
-                    break;
-                case 'poker':
-                    window.location.href = 'coming-soon.html?game=poker';
-                    break;
                 default:
-                    window.location.href = 'coming-soon.html';
+                    // For coming soon games, show the coming soon page
+                    window.location.href = `coming-soon.html?game=${selectedGameId}`;
             }
         }
+
+        // Close modal when clicking outside
+        document.getElementById('gameModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
 
         // Add smooth scrolling behavior
         document.addEventListener('DOMContentLoaded', function() {
