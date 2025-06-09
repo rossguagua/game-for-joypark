@@ -1,4 +1,4 @@
-import{g as m}from"./supabase-Bwuv_4SX.js";let c=[],s=null;function r(e){return`/images/covers/${e}.png`}async function g(){try{console.log("Loading games from database...");const e=performance.now(),t=await m(),d=performance.now()-e;console.log(`Games loaded in ${d.toFixed(2)}ms:`,t),c=t,u()}catch(e){console.error("Error loading games:",e),document.getElementById("loadingState").innerHTML=`
+import{g as m}from"./supabase-Bwuv_4SX.js";let c=[],s=null;function r(e){return e==="drinking-topics"?null:`images/covers/${e}.png`}async function g(){try{console.log("Loading games from database...");const e=performance.now(),t=await m(),d=performance.now()-e;console.log(`Games loaded in ${d.toFixed(2)}ms:`,t),c=t,u()}catch(e){console.error("Error loading games:",e),document.getElementById("loadingState").innerHTML=`
                     <div class="text-center py-8">
                         <p class="text-red-400 mb-4">加载游戏失败</p>
                         <button onclick="location.reload()" class="bg-red-500 text-white px-4 py-2 rounded">重试</button>
