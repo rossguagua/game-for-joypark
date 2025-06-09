@@ -575,12 +575,14 @@
             .then(response => response.json())
             .then(data => {
                 gamesData = data;
+                console.log('Games data loaded:', gamesData);
             })
             .catch(error => {
                 console.error('Error loading games data:', error);
             });
 
         function showGamePreview(gameId) {
+            console.log('Showing preview for game:', gameId);
             selectedGameId = gameId;
             const game = gamesData[gameId];
             
@@ -648,15 +650,23 @@
         }
 
         function startSelectedGame() {
-            if (!selectedGameId) return;
+            console.log('Starting game:', selectedGameId);
             
-            closeModal();
-            
-            // Navigate to game - only drinking-topics is available
-            if (selectedGameId === 'drinking-topics') {
-                window.location.href = 'drinking-game.html';
+            if (!selectedGameId) {
+                console.error('No game selected');
+                return;
             }
-            // All other games are coming soon, so we don't navigate anywhere
+            
+            // Only proceed if it's the drinking-topics game
+            if (selectedGameId === 'drinking-topics') {
+                console.log('Navigating to drinking-game.html');
+                closeModal();
+                window.location.href = 'drinking-game.html';
+            } else {
+                console.log('Game is coming soon, not navigating');
+                // For coming soon games, we don't navigate anywhere
+                // The button should be disabled anyway
+            }
         }
 
         // Close modal when clicking outside
