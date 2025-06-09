@@ -392,22 +392,6 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
-
-        /* 图片加载优化 */
-        .game-image {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: opacity 0.3s ease;
-        }
-
-        .game-image.loading {
-            opacity: 0.5;
-        }
-
-        .game-image.loaded {
-            opacity: 1;
-        }
     </style>
 </head>
 <body class="bg-[#151515] text-white">
@@ -449,7 +433,7 @@
                     </svg>
                 </button>
                 
-                <img src="https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=100" alt="酒宝公园" class="modal-logo">
+                <img src="images/image copy copy copy copy copy.png" alt="酒宝公园" class="modal-logo">
                 <div id="modalTitle" class="modal-title">游戏标题</div>
             </div>
             
@@ -487,7 +471,7 @@
     <div class="main-container">
         <!-- Logo Section -->
         <div class="logo-section">
-            <img src="https://images.pexels.com/photos/1267320/pexels-photo-1267320.jpeg?auto=compress&cs=tinysrgb&w=140" alt="酒宝公园" class="logo-image">
+            <img src="images/jiubao-park-logo.png/image.png" alt="酒宝公园" class="logo-image">
         </div>
 
         <!-- Loading State -->
@@ -513,15 +497,17 @@
         let gamesData = [];
         let selectedGameId = null;
 
-        // 图片预加载函数
-        function preloadImage(src) {
-            return new Promise((resolve, reject) => {
-                const img = new Image();
-                img.onload = () => resolve(img);
-                img.onerror = reject;
-                img.src = src;
-            });
-        }
+        // 恢复原始游戏背景图片映射
+        const gameBackgrounds = {
+            'battle-royale': 'images/eat-chicken-battle-royale.png/image.png',
+            'kiss-marks': 'images/second-kiss-mark.png/image.png',
+            'party-psychology': 'images/party-psychology.png/image.png',
+            'wisdom': 'images/jiubao-quick-wit.png/image.png',
+            'man-di-piao-ling': 'images/man-di-piao-ling.png/image.png',
+            'moon-night': 'images/jiubao-yuanyue-ye/image.png',
+            'love-battle': 'images/chun-ai-da-zuo-zhan.png/image.png',
+            'poker': 'images/de-zhou-pu-ke-pai.png/image.png'
+        };
 
         // 优化后的游戏加载函数 - 只获取核心数据
         async function loadGames() {
@@ -536,7 +522,7 @@
                 console.log(`Games loaded in ${loadTime.toFixed(2)}ms:`, games);
                 
                 gamesData = games;
-                await renderGames();
+                renderGames();
             } catch (error) {
                 console.error('Error loading games:', error);
                 document.getElementById('loadingState').innerHTML = `
@@ -548,8 +534,8 @@
             }
         }
 
-        // 优化后的游戏渲染函数 - 使用数据库中的图片URL
-        async function renderGames() {
+        // 渲染游戏列表 - 使用原始图片路径
+        function renderGames() {
             const loadingState = document.getElementById('loadingState');
             const mainGameSection = document.getElementById('mainGameSection');
             const gameGrid = document.getElementById('gameGrid');
@@ -560,57 +546,31 @@
             // 找到主要游戏（聊天破冰盲盒）
             const mainGame = gamesData.find(game => game.category_tag === 'drinking-topics');
             if (mainGame) {
-                // 使用数据库中的图片URL或回退到默认样式
-                const backgroundStyle = mainGame.image_url 
-                    ? `background-image: url('${mainGame.image_url}'); background-size: cover; background-position: center;`
-                    : '';
-                
                 mainGameSection.innerHTML = `
                     <div class="game-card" onclick="showGamePreview('${mainGame.category_tag}')">
-                        <div class="main-game-card ${!mainGame.image_url ? 'main-game-fallback' : ''}" style="${backgroundStyle}">
-                            ${!mainGame.image_url ? `
-                                <div class="main-game-title">${mainGame.name}</div>
-                                <div class="main-game-subtitle">${mainGame.description}</div>
-                            ` : `
-                                <div class="game-text-overlay">
-                                    <div class="main-game-title">${mainGame.name}</div>
-                                    <div class="main-game-subtitle">${mainGame.description}</div>
-                                </div>
-                            `}
+                        <div class="main-game-card main-game-fallback">
+                            <div class="main-game-title">${mainGame.name}</div>
+                            <div class="main-game-subtitle">${mainGame.description}</div>
                         </div>
                     </div>
                 `;
                 mainGameSection.style.display = 'block';
             }
 
-            // 渲染其他游戏 - 使用数据库中的图片URL
+            // 渲染其他游戏 - 使用原始图片路径
             const otherGames = gamesData.filter(game => game.category_tag !== 'drinking-topics');
-            
-            // 预加载图片以提升用户体验
-            const imagePromises = otherGames
-                .filter(game => game.image_url)
-                .map(game => preloadImage(game.image_url).catch(() => null));
-            
-            // 等待图片预加载完成（但不阻塞渲染）
-            Promise.all(imagePromises).then(() => {
-                console.log('Images preloaded successfully');
-            });
-
             gameGrid.innerHTML = otherGames.map(game => {
+                const backgroundImage = gameBackgrounds[game.category_tag];
                 const isComingSoon = game.category_tag !== 'drinking-topics';
-                const backgroundStyle = game.image_url 
-                    ? `background-image: url('${game.image_url}')`
-                    : 'background: linear-gradient(135deg, #666 0%, #333 100%)';
                 
                 return `
                     <div class="game-card ${isComingSoon ? 'coming-soon' : ''}" onclick="showGamePreview('${game.category_tag}')">
-                        <div class="game-card-content" style="${backgroundStyle}">
-                            <!-- 动态背景图片来自数据库 -->
+                        <div class="game-card-content" style="${backgroundImage ? `background-image: url('${backgroundImage}')` : 'background: linear-gradient(135deg, #666 0%, #333 100%)'}">
+                            <!-- Image background is set via style -->
                         </div>
                     </div>
                 `;
             }).join('');
-            
             gameGrid.style.display = 'grid';
         }
 
