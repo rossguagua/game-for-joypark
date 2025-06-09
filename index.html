@@ -460,25 +460,18 @@
         let gamesData = [];
         let selectedGameId = null;
 
-        // 恢复原始游戏背景图片映射
-        const gameBackgrounds = {
-            'battle-royale': 'images/eat-chicken-battle-royale.png/image.png',
-            'kiss-marks': 'images/second-kiss-mark.png/image.png',
-            'party-psychology': 'images/party-psychology.png/image.png',
-            'wisdom': 'images/jiubao-quick-wit.png/image.png',
-            'man-di-piao-ling': 'images/man-di-piao-ling.png/image.png',
-            'moon-night': 'images/jiubao-yuanyue-ye/image.png',
-            'love-battle': 'images/chun-ai-da-zuo-zhan.png/image.png',
-            'poker': 'images/de-zhou-pu-ke-pai.png/image.png'
-        };
+        // 本地化游戏封面图片映射 - 根据category_tag拼接本地路径
+        function getGameCoverPath(categoryTag) {
+            return `/images/covers/${categoryTag}.png`;
+        }
 
-        // 优化后的游戏加载函数 - 只获取核心数据
+        // 优化后的游戏加载函数 - 只获取核心数据，不包含图片URL
         async function loadGames() {
             try {
                 console.log('Loading games from database...');
                 const startTime = performance.now();
                 
-                // 只获取游戏基础信息，不包含卡片数据
+                // 只获取游戏基础信息，不包含卡片数据和图片URL
                 const games = await getGames();
                 
                 const loadTime = performance.now() - startTime;
@@ -497,7 +490,7 @@
             }
         }
 
-        // 渲染游戏列表 - 使用原始图片路径
+        // 渲染游戏列表 - 使用本地图片路径
         function renderGames() {
             const loadingState = document.getElementById('loadingState');
             const mainGameSection = document.getElementById('mainGameSection');
@@ -520,16 +513,17 @@
                 mainGameSection.style.display = 'block';
             }
 
-            // 渲染其他游戏 - 使用原始图片路径
+            // 渲染其他游戏 - 使用本地图片路径
             const otherGames = gamesData.filter(game => game.category_tag !== 'drinking-topics');
             gameGrid.innerHTML = otherGames.map(game => {
-                const backgroundImage = gameBackgrounds[game.category_tag];
+                // 根据category_tag拼接本地图片路径
+                const imagePath = getGameCoverPath(game.category_tag);
                 const isComingSoon = game.category_tag !== 'drinking-topics';
                 
                 return `
                     <div class="game-card ${isComingSoon ? 'coming-soon' : ''}" onclick="showGamePreview('${game.category_tag}')">
-                        <div class="game-card-content" style="${backgroundImage ? `background-image: url('${backgroundImage}')` : 'background: linear-gradient(135deg, #666 0%, #333 100%)'}">
-                            <!-- Image background is set via style -->
+                        <div class="game-card-content" style="background-image: url('${imagePath}')">
+                            <!-- Local image background is set via style -->
                         </div>
                     </div>
                 `;

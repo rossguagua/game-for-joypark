@@ -18,7 +18,6 @@ export interface Game {
   features: string[] | null
   players: string | null
   duration: string | null
-  image_url: string | null
   is_active: boolean
   created_at: string
 }
@@ -32,11 +31,11 @@ export interface Card {
   created_at: string
 }
 
-// 优化后的API函数 - 只返回核心游戏信息，不包含卡片数据
+// 优化后的API函数 - 只返回核心游戏信息，不包含卡片数据和图片URL
 export async function getGames(): Promise<Game[]> {
   const { data, error } = await supabase
     .from('games')
-    .select('id, name, category_tag, description, features, players, duration, image_url, is_active, created_at')
+    .select('id, name, category_tag, description, features, players, duration, is_active, created_at')
     .eq('is_active', true)
     .order('created_at', { ascending: true })
 
