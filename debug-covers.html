@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>封面图片调试页面</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #f0f0f0; }
+        .debug-section { margin: 20px 0; padding: 15px; background: white; border-radius: 8px; }
+        .image-test { margin: 10px 0; padding: 10px; border: 1px solid #ddd; }
+        .image-test img { max-width: 200px; height: auto; margin: 10px; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>游戏封面图片调试页面</h1>
+    
+    <div class="debug-section">
+        <h2>排查指令一：确认文件物理结构</h2>
+        <p>项目根目录结构检查：</p>
+        <ul>
+            <li>index.html ✓</li>
+            <li>images/ 文件夹 - <span id="images-folder-check">检查中...</span></li>
+            <li>images/covers/ 文件夹 - <span id="covers-folder-check">检查中...</span></li>
+        </ul>
+    </div>
+
+    <div class="debug-section">
+        <h2>排查指令二：文件名与category_tag匹配检查</h2>
+        <p>数据库中的游戏及其对应的图片文件：</p>
+        <div id="file-matching-results">检查中...</div>
+    </div>
+
+    <div class="debug-section">
+        <h2>排查指令三：代码路径验证</h2>
+        <p>当前使用的图片路径模式：</p>
+        <code id="path-pattern">images/covers/${categoryTag}.png</code>
+    </div>
+
+    <div class="debug-section">
+        <h2>排查指令四：实际图片加载测试</h2>
+        <p>以下是所有游戏封面的加载测试：</p>
+        <div id="image-loading-tests">加载中...</div>
+    </div>
+
+    <script>
+        // 模拟数据库中的游戏数据
+        const gamesData = [
+            { name: '聊天破冰盲盒', category_tag: 'drinking-topics' },
+            { name: '得吃大逃杀', category_tag: 'battle-royale' },
+            { name: '二本吻痕', category_tag: 'kiss-marks' },
+            { name: '派对心理学', category_tag: 'party-psychology' },
+            { name: '酒宝急生智', category_tag: 'wisdom' },
+            { name: '满地飘零', category_tag: 'man-di-piao-ling' },
+            { name: '酒宝月圆夜', category_tag: 'moon-night' },
+            { name: '纯爱大作战', category_tag: 'love-battle' },
+            { name: '德州扑克牌', category_tag: 'poker' }
+        ];
+
+        // 检查文件夹结构
+        function checkFolderStructure() {
+            // 这里我们通过尝试加载一个已知存在的图片来检查文件夹
+            const testImg = new Image();
+            testImg.onload = function() {
+                document.getElementById('images-folder-check').innerHTML = '<span class="success">✓ 存在</span>';
+                document.getElementById('covers-folder-check').innerHTML = '<span class="success">✓ 存在</span>';
+            };
+            testImg.onerror = function() {
+                document.getElementById('images-folder-check').innerHTML = '<span class="error">✗ 不存在或路径错误</span>';
+                document.getElementById('covers-folder-check').innerHTML = '<span class="error">✗ 不存在或路径错误</span>';
+            };
+            testImg.src = 'images/covers/battle-royale.png';
+        }
+
+        // 检查文件名匹配
+        function checkFileMatching() {
+            const container = document.getElementById('file-matching-results');
+            let html = '<table border="1" style="width:100%; border-collapse: collapse;"><tr><th>游戏名称</th><th>category_tag</th><th>期望文件名</th><th>文件存在性</th></tr>';
+            
+            gamesData.forEach(game => {
+                const expectedFileName = `${game.category_tag}.png`;
+                const fullPath = `images/covers/${expectedFileName}`;
+                
+                html += `<tr>
+                    <td>${game.name}</td>
+                    <td>${game.category_tag}</td>
+                    <td>${expectedFileName}</td>
+                    <td id="file-check-${game.category_tag}">检查中...</td>
+                </tr>`;
+            });
+            
+            html += '</table>';
+            container.innerHTML = html;
+
+            // 检查每个文件是否存在
+            gamesData.forEach(game => {
+                const img = new Image();
+                const cellId = `file-check-${game.category_tag}`;
+                
+                img.onload = function() {
+                    document.getElementById(cellId).innerHTML = '<span class="success">✓ 存在</span>';
+                };
+                
+                img.onerror = function() {
+                    document.getElementById(cellId).innerHTML = '<span class="error">✗ 不存在</span>';
+                };
+                
+                img.src = `images/covers/${game.category_tag}.png`;
+            });
+        }
+
+        // 实际图片加载测试
+        function testImageLoading() {
+            const container = document.getElementById('image-loading-tests');
+            let html = '';
+
+            gamesData.forEach(game => {
+                const imagePath = `images/covers/${game.category_tag}.png`;
+                html += `
+                    <div class="image-test">
+                        <h4>${game.name} (${game.category_tag})</h4>
+                        <p>路径: <code>${imagePath}</code></p>
+                        <img src="${imagePath}" alt="${game.name}" 
+                             onload="this.nextElementSibling.innerHTML='<span class=\\"success\\">✓ 加载成功</span>'"
+                             onerror="this.nextElementSibling.innerHTML='<span class=\\"error\\">✗ 加载失败</span>'">
+                        <div>加载中...</div>
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        // 执行所有检查
+        checkFolderStructure();
+        checkFileMatching();
+        testImageLoading();
+
+        // 输出当前路径信息到控制台
+        console.log('当前页面URL:', window.location.href);
+        console.log('当前页面路径:', window.location.pathname);
+        console.log('图片路径模式:', 'images/covers/${categoryTag}.png');
+    </script>
+</body>
+</html>

@@ -462,6 +462,10 @@
 
         // 本地化游戏封面图片映射 - 根据category_tag拼接本地路径
         function getGameCoverPath(categoryTag) {
+            // 为 drinking-topics 使用特殊处理，因为它没有对应的封面图片
+            if (categoryTag === 'drinking-topics') {
+                return null; // 返回 null，让主游戏使用渐变背景
+            }
             return `images/covers/${categoryTag}.png`;
         }
 
@@ -502,6 +506,7 @@
             // 找到主要游戏（聊天破冰盲盒）
             const mainGame = gamesData.find(game => game.category_tag === 'drinking-topics');
             if (mainGame) {
+                // 主游戏使用渐变背景，不使用图片
                 mainGameSection.innerHTML = `
                     <div class="game-card" onclick="showGamePreview('${mainGame.category_tag}')">
                         <div class="main-game-card main-game-fallback">
