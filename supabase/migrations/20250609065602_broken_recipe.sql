@@ -1,31 +1,32 @@
 /*
-  # Create games and cards tables with RLS policies
+  # 初始化游戏数据库架构
 
-  1. New Tables
-    - `games`
-      - `id` (uuid, primary key)
-      - `name` (text, unique)
-      - `category_tag` (text, unique)
-      - `description` (text)
-      - `features` (jsonb array)
-      - `players` (text)
-      - `duration` (text)
-      - `is_active` (boolean, default true)
-      - `created_at` (timestamp)
-    - `cards`
-      - `id` (uuid, primary key)
-      - `game_id` (uuid, foreign key to games)
-      - `category` (text)
-      - `content` (text)
-      - `is_active` (boolean, default true)
-      - `created_at` (timestamp)
+  1. 新建表
+    - `games` 表：存储游戏基本信息
+      - `id` (uuid, 主键)
+      - `name` (text, 游戏名称)
+      - `category_tag` (text, 分类标签)
+      - `description` (text, 游戏描述)
+      - `features` (jsonb, 游戏特色)
+      - `players` (text, 适合人数)
+      - `duration` (text, 游戏时长)
+      - `is_active` (boolean, 是否激活)
+      - `created_at` (timestamp, 创建时间)
+    
+    - `cards` 表：存储游戏卡片内容
+      - `id` (uuid, 主键)
+      - `game_id` (uuid, 外键关联games表)
+      - `category` (text, 卡片分类)
+      - `content` (text, 卡片内容)
+      - `is_active` (boolean, 是否激活)
+      - `created_at` (timestamp, 创建时间)
 
-  2. Security
-    - Enable RLS on both tables
-    - Add policies for public read access to active records
+  2. 安全设置
+    - 启用两个表的行级安全策略
+    - 创建公开读取策略，允许匿名和认证用户读取激活的数据
 
-  3. Initial Data
-    - Insert 9 games with their metadata
+  3. 初始数据
+    - 插入9个游戏的基本信息
 */
 
 -- 创建 games 表
@@ -51,42 +52,33 @@ CREATE TABLE IF NOT EXISTS cards (
   created_at timestamptz DEFAULT now()
 );
 
+-- 创建索引以提高查询性能
+CREATE INDEX IF NOT EXISTS idx_games_category_tag ON games(category_tag);
+CREATE INDEX IF NOT EXISTS idx_cards_game_id ON cards(game_id);
+CREATE INDEX IF NOT EXISTS idx_cards_category ON cards(category);
+
 -- 启用行级安全
 ALTER TABLE games ENABLE ROW LEVEL SECURITY;
 ALTER TABLE cards ENABLE ROW LEVEL SECURITY;
 
--- 创建公开读取策略（使用 IF NOT EXISTS 检查）
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies 
-    WHERE tablename = 'games' 
-    AND policyname = 'Games are publicly readable'
-  ) THEN
-    CREATE POLICY "Games are publicly readable"
-      ON games
-      FOR SELECT
-      TO anon, authenticated
-      USING (is_active = true);
-  END IF;
-END $$;
+-- 删除可能存在的旧策略（避免重复创建错误）
+DROP POLICY IF EXISTS "Games are publicly readable" ON games;
+DROP POLICY IF EXISTS "Cards are publicly readable" ON cards;
 
-DO $$
-BEGIN
-  IF NOT EXISTS (
-    SELECT 1 FROM pg_policies 
-    WHERE tablename = 'cards' 
-    AND policyname = 'Cards are publicly readable'
-  ) THEN
-    CREATE POLICY "Cards are publicly readable"
-      ON cards
-      FOR SELECT
-      TO anon, authenticated
-      USING (is_active = true);
-  END IF;
-END $$;
+-- 创建新的公开读取策略
+CREATE POLICY "Games are publicly readable"
+  ON games
+  FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
 
--- 插入游戏数据（使用 ON CONFLICT DO NOTHING 避免重复插入）
+CREATE POLICY "Cards are publicly readable"
+  ON cards
+  FOR SELECT
+  TO anon, authenticated
+  USING (is_active = true);
+
+-- 插入游戏数据（使用 ON CONFLICT 避免重复插入）
 INSERT INTO games (name, category_tag, description, features, players, duration) VALUES
 (
   '聊天破冰盲盒',
@@ -160,4 +152,9 @@ INSERT INTO games (name, category_tag, description, features, players, duration)
   '2-9人',
   '20-45分钟'
 )
-ON CONFLICT (name) DO NOTHING;
+ON CONFLICT (category_tag) DO UPDATE SET
+  name = EXCLUDED.name,
+  description = EXCLUDED.description,
+  features = EXCLUDED.features,
+  players = EXCLUDED.players,
+  duration = EXCLUDED.duration;
