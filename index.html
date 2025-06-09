@@ -652,15 +652,11 @@
             
             closeModal();
             
-            // Navigate to game
-            switch(selectedGameId) {
-                case 'drinking-topics':
-                    window.location.href = 'drinking-game.html';
-                    break;
-                default:
-                    // For coming soon games, show the coming soon page
-                    window.location.href = `coming-soon.html?game=${selectedGameId}`;
+            // Navigate to game - only drinking-topics is available
+            if (selectedGameId === 'drinking-topics') {
+                window.location.href = 'drinking-game.html';
             }
+            // All other games are coming soon, so we don't navigate anywhere
         }
 
         // Close modal when clicking outside
