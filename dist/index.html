@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>酒宝公园 - 游戏库</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #151515;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .status-bar {
+            background: #151515;
+            height: 48px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+        }
+        
+        .game-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+            border-radius: 16px;
+            overflow: hidden;
+        }
+        
+        .game-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+        }
+        
+        .game-card:active {
+            transform: translateY(-2px);
+        }
+        
+        .main-container {
+            padding-top: 48px;
+            padding-bottom: 40px;
+            min-height: 100vh;
+        }
+        
+        .logo-section {
+            padding: 32px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #151515;
+        }
+        
+        .main-game-section {
+            padding: 0 24px 24px 24px;
+            max-width: 390px;
+            margin: 0 auto;
+        }
+        
+        .main-game-card {
+            width: 100%;
+            height: 200px;
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-weight: bold;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            margin-bottom: 0;
+        }
+        
+        .game-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            padding: 0 24px;
+            max-width: 390px;
+            margin: 0 auto;
+        }
+        
+        .game-card-content {
+            width: 100%;
+            height: 240px;
+            border-radius: 16px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 0;
+            color: white;
+            font-weight: bold;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+        
+        .game-title {
+            font-size: 18px;
+            font-weight: 900;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .game-subtitle {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+        
+        .logo-image {
+            max-width: 140px;
+            max-height: 100px;
+            object-fit: contain;
+        }
+        
+        /* Game specific backgrounds using uploaded images */
+        .game-1 {
+            background-image: url('/assets/image-DQVpF9C7.png');
+        }
+        
+        .game-2 {
+            background-image: url('/assets/image-prcpXXiD.png');
+        }
+        
+        .game-3 {
+            background-image: url('/assets/image-Ds4FHBYV.png');
+        }
+        
+        .game-4 {
+            background-image: url('/assets/image-DSf-JUyk.png');
+        }
+        
+        .game-5 {
+            background-image: url('/assets/image-D8Z-YQ0i.png');
+        }
+        
+        .game-6 {
+            background-image: url('/assets/image-oivZ8Ufq.png');
+        }
+        
+        .game-7 {
+            background-image: url('/assets/image-Dqab5ex8.png');
+        }
+        
+        .game-8 {
+            background-image: url('/assets/image-CLS8oARq.png');
+        }
+        
+        .coming-soon {
+            opacity: 0.7;
+            position: relative;
+        }
+        
+        .coming-soon::after {
+            content: "即将推出";
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 6px 12px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 10;
+        }
+
+        /* Text overlay for better readability on images */
+        .game-text-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(transparent, rgba(0,0,0,0.7));
+            padding: 16px;
+            border-radius: 0 0 16px 16px;
+        }
+
+        /* Ensure smooth scrolling */
+        html {
+            scroll-behavior: smooth;
+        }
+
+        /* Main game fallback styling */
+        .main-game-fallback {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 50%, #ff3838 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .main-game-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .main-game-subtitle {
+            font-size: 14px;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, rgba(21, 21, 21, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 0;
+            max-width: 340px;
+            width: 100%;
+            color: white;
+            position: relative;
+            transform: translateY(30px) scale(0.9);
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            overflow: hidden;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            padding: 24px 24px 20px 24px;
+            text-align: center;
+            position: relative;
+        }
+
+        .modal-logo {
+            max-width: 100px;
+            max-height: 60px;
+            object-fit: contain;
+            margin-bottom: 12px;
+            filter: brightness(1.1) contrast(1.1);
+        }
+
+        .modal-body {
+            padding: 24px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.1);
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            color: white;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-description {
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+            color: #e0e0e0;
+        }
+
+        .modal-features {
+            margin-bottom: 20px;
+        }
+
+        .modal-features h4 {
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            color: white;
+        }
+
+        .feature-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .feature-tag {
+            background: rgba(255, 107, 107, 0.2);
+            color: #ff9999;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .modal-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+        }
+
+        .info-item {
+            text-align: center;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: #aaa;
+            margin-bottom: 4px;
+        }
+
+        .info-value {
+            font-size: 14px;
+            font-weight: 700;
+            color: white;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+        }
+
+        .btn-start {
+            flex: 1;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-start:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+        }
+
+        .btn-start:active {
+            transform: translateY(0);
+        }
+
+        .btn-start:disabled {
+            background: rgba(255, 255, 255, 0.1);
+            color: #888;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .coming-soon-badge {
+            display: inline-block;
+            background: rgba(255, 193, 7, 0.2);
+            color: #ffcc00;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+  <script type="module" crossorigin src="/assets/main-ZIKmzN3o.js"></script>
+  <link rel="modulepreload" crossorigin href="/assets/supabase-BFUGbfn1.js">
+</head>
+<body class="bg-[#151515] text-white">
+    <!-- Status Bar -->
+    <div class="status-bar">
+        <div class="flex items-center justify-between px-6 h-full">
+            <div class="text-white font-medium text-sm">9:41</div>
+            <div class="flex items-center space-x-2">
+                <!-- Signal bars -->
+                <div class="flex space-x-1">
+                    <div class="w-1 h-2 bg-white rounded-full"></div>
+                    <div class="w-1 h-3 bg-white rounded-full"></div>
+                    <div class="w-1 h-4 bg-white rounded-full"></div>
+                    <div class="w-1 h-4 bg-white rounded-full"></div>
+                </div>
+                <!-- WiFi -->
+                <svg width="15" height="11" viewBox="0 0 15 11" fill="none">
+                    <path d="M1.5 4.5C3.5 2.5 6 1.5 7.5 1.5C9 1.5 11.5 2.5 13.5 4.5M3.5 6.5C4.5 5.5 6 5 7.5 5C9 5 10.5 5.5 11.5 6.5M6 8.5C6.5 8 7 7.5 7.5 7.5C8 7.5 8.5 8 9 8.5" stroke="white" stroke-width="1" stroke-linecap="round"/>
+                </svg>
+                <!-- Battery -->
+                <div class="flex items-center">
+                    <div class="w-6 h-3 border border-white border-opacity-60 rounded-sm">
+                        <div class="w-4 h-1.5 bg-white rounded-sm m-0.5"></div>
+                    </div>
+                    <div class="w-0.5 h-1 bg-white bg-opacity-60 ml-0.5 rounded-full"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Preview Modal -->
+    <div id="gameModal" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="modal-close" onclick="closeModal()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="18" y1="6" x2="6" y2="18"></line>
+                        <line x1="6" y1="6" x2="18" y2="18"></line>
+                    </svg>
+                </button>
+                
+                <img src="/assets/image%20copy%20copy%20copy%20copy%20copy-CJojErDc.png" alt="酒宝公园" class="modal-logo">
+                <div id="modalTitle" class="modal-title">游戏标题</div>
+            </div>
+            
+            <div class="modal-body">
+                <div id="modalDescription" class="modal-description">游戏描述</div>
+                
+                <div class="modal-features">
+                    <h4>游戏特色</h4>
+                    <div id="modalFeatures" class="feature-tags">
+                        <!-- Features will be populated here -->
+                    </div>
+                </div>
+                
+                <div class="modal-info">
+                    <div class="info-item">
+                        <div class="info-label">适合人数</div>
+                        <div id="modalPlayers" class="info-value">2-8人</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">游戏时长</div>
+                        <div id="modalDuration" class="info-value">15-30分钟</div>
+                    </div>
+                </div>
+                
+                <div class="modal-buttons">
+                    <button id="startGameBtn" class="btn-start" onclick="startSelectedGame()">
+                        开始游戏
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Container -->
+    <div class="main-container">
+        <!-- Logo Section -->
+        <div class="logo-section">
+            <img src="/assets/image-BmWtGS7o.png" alt="酒宝公园" class="logo-image">
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="text-center py-8">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-400">正在加载游戏...</p>
+        </div>
+
+        <!-- Main Game Section -->
+        <div id="mainGameSection" class="main-game-section" style="display: none;">
+            <!-- Main game will be populated here -->
+        </div>
+
+        <!-- Game Grid -->
+        <div id="gameGrid" class="game-grid" style="display: none;">
+            <!-- Other games will be populated here -->
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>喝酒话题游戏</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      body {
+        font-family: 'Inter', sans-serif;
+        background-color: #151515;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        min-height: 100vh;
+        padding-top: 100px;
+        padding-bottom: 80px;
+        overflow-x: hidden;
+      }
+
+      .topic-fade-out {
+        animation: fadeOutTopic 0.3s ease-in-out forwards;
+      }
+      .topic-fade-in {
+        animation: fadeInTopic 0.3s ease-in-out forwards;
+      }
+
+      @keyframes fadeInTopic {
+        from {
+          opacity: 0;
+          transform: translateY(15px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeOutTopic {
+        from {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        to {
+          opacity: 0;
+          transform: translateY(-15px);
+        }
+      }
+
+      .font-mi-sans {
+        /* Placeholder */
+      }
+      .font-rajdhani {
+        /* Placeholder */
+      }
+
+      .category-text-part {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        line-height: 1.2;
+        height: 100%;
+      }
+
+      .category-selector {
+        transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55),
+          opacity 0.4s ease-out;
+        transform-origin: center top;
+        position: absolute;
+        border-radius: 0.75rem;
+        cursor: pointer;
+      }
+
+      #topic-card {
+        position: relative;
+        padding-top: 80px;
+        box-shadow: 0px 8px 25px rgba(0, 0, 0, 0.35),
+          0px 4px 12px rgba(0, 0, 0, 0.25);
+      }
+
+      #category-selectors-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 80px;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+      }
+
+      .back-button {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        color: white;
+        padding: 12px 24px;
+        border-radius: 25px;
+        font-size: 14px;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        z-index: 100;
+      }
+
+      .back-button:hover {
+        background: rgba(255, 255, 255, 0.25);
+        transform: translateX(-50%) translateY(-2px);
+      }
+
+      .back-button:active {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* Completion Modal Styles */
+      .completion-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.8);
+        backdrop-filter: blur(8px);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s ease;
+      }
+
+      .completion-modal.active {
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .completion-content {
+        background: linear-gradient(135deg, rgba(21, 21, 21, 0.95) 0%, rgba(40, 40, 40, 0.95) 100%);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        padding: 32px 24px;
+        max-width: 320px;
+        width: 100%;
+        color: white;
+        text-align: center;
+        transform: translateY(30px) scale(0.9);
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+      }
+
+      .completion-modal.active .completion-content {
+        transform: translateY(0) scale(1);
+      }
+
+      .completion-icon {
+        width: 80px;
+        height: 80px;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 20px;
+        animation: pulse 2s infinite;
+      }
+
+      @keyframes pulse {
+        0%, 100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.05);
+          opacity: 0.8;
+        }
+      }
+
+      .completion-title {
+        font-size: 24px;
+        font-weight: 900;
+        margin-bottom: 12px;
+        color: white;
+      }
+
+      .completion-description {
+        font-size: 16px;
+        line-height: 1.5;
+        margin-bottom: 24px;
+        color: #e0e0e0;
+      }
+
+      .completion-stats {
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        padding: 16px;
+        margin-bottom: 24px;
+      }
+
+      .stats-item {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+      }
+
+      .stats-item:last-child {
+        margin-bottom: 0;
+      }
+
+      .stats-label {
+        color: #aaa;
+        font-size: 14px;
+      }
+
+      .stats-value {
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+      }
+
+      .completion-buttons {
+        display: flex;
+        gap: 12px;
+      }
+
+      .btn-restart, .btn-continue {
+        flex: 1;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 14px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s ease;
+      }
+
+      .btn-restart {
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+        color: white;
+      }
+
+      .btn-restart:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+      }
+
+      .btn-continue {
+        background: rgba(255, 255, 255, 0.1);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .btn-continue:hover {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      /* Progress indicator */
+      .progress-indicator {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: rgba(0, 0, 0, 0.6);
+        color: white;
+        padding: 4px 8px;
+        border-radius: 12px;
+        font-size: 12px;
+        font-weight: 600;
+        z-index: 10;
+      }
+
+      .loading-spinner {
+        display: inline-block;
+        width: 20px;
+        height: 20px;
+        border: 3px solid rgba(255, 255, 255, 0.3);
+        border-radius: 50%;
+        border-top-color: #fff;
+        animation: spin 1s ease-in-out infinite;
+      }
+
+      @keyframes spin {
+        to { transform: rotate(360deg); }
+      }
+
+      .error-message {
+        color: #ff6b6b;
+        text-align: center;
+        padding: 20px;
+        background: rgba(255, 107, 107, 0.1);
+        border: 1px solid rgba(255, 107, 107, 0.3);
+        border-radius: 12px;
+        margin: 20px;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/game-BpOqOulD.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/supabase-BFUGbfn1.js">
+  </head>
+  <body class="bg-[#151515] text-white">
+    <!-- Loading State -->
+    <div id="loadingState" class="text-center py-8">
+      <div class="loading-spinner mx-auto mb-4"></div>
+      <p class="text-gray-400">正在加载游戏数据...</p>
+    </div>
+
+    <!-- Error State -->
+    <div id="errorState" class="error-message" style="display: none;">
+      <p class="mb-4">加载游戏数据失败</p>
+      <button onclick="location.reload()" class="bg-red-500 text-white px-4 py-2 rounded">重试</button>
+    </div>
+
+    <!-- Game Container -->
+    <div id="gameContainer" class="container w-full max-w-[350px] p-4 flex flex-col items-center" style="display: none;">
+      <div
+        id="topic-card"
+        class="w-full h-[500px] rounded-xl flex flex-col items-center justify-between cursor-pointer transition-colors duration-300 ease-in-out"
+      >
+        <!-- Progress Indicator -->
+        <div id="progressIndicator" class="progress-indicator">
+          0/0
+        </div>
+
+        <div id="category-selectors-container">
+          <div
+            data-category-id="surprise"
+            class="category-selector w-[264px] h-[100px]"
+            style="background-color: #ffc9dc"
+          >
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #f93c7e; color: #2df92a"
+            >
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >盲盒 Surprise Me</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            data-category-id="intense"
+            class="category-selector w-[280px] h-[100px]"
+            style="background-color: #b8b4ff"
+          >
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #342af6; color: #ff2470"
+            >
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >加麻加辣 Intense</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            data-category-id="ontheedge"
+            class="category-selector w-[296px] h-[100px]"
+            style="background-color: #a0e7e5"
+          >
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #ffc9dc; color: #560ee6"
+            >
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >微辣 On the Edge</span
+                >
+              </div>
+            </div>
+          </div>
+          <div
+            data-category-id="mildmode"
+            class="category-selector w-[316px] h-[100px]"
+            style="background-color: #c8fd0b"
+          >
+            <div
+              class="absolute right-0 top-1/10 -translate-y-1/4 w-[128px] h-[32px] rounded-lg flex items-center justify-center"
+              style="background-color: #2df92a; color: black"
+            >
+              <div class="category-text-part">
+                <span class="text-xs font-medium font-mi-sans block"
+                  >清汤 Mild Mode</span
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div
+          id="topic-text"
+          class="text-3xl md:text-4xl font-extrabold uppercase text-center leading-tight flex items-center justify-center h-full px-4 mt-[20px] mb-auto"
+          style="letter-spacing: 0.02em"
+        >
+          点击卡片开始
+        </div>
+
+        <button
+          id="refresh-button"
+          aria-label="下一个话题"
+          class="bg-black rounded-full p-3 w-16 h-16 flex items-center justify-center text-white shadow-lg mb-6 z-50 hover:bg-gray-800 transition-colors"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke-width="2"
+            stroke="currentColor"
+            class="w-8 h-8"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Completion Modal -->
+    <div id="completionModal" class="completion-modal">
+      <div class="completion-content">
+        <div class="completion-icon">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-10 h-10 text-white">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        
+        <div class="completion-title">🎉 恭喜完成！</div>
+        <div class="completion-description">
+          你已经解锁了本类别的所有话题！每一个话题都为今晚增添了精彩。
+        </div>
+        
+        <div class="completion-stats">
+          <div class="stats-item">
+            <span class="stats-label">已完成话题</span>
+            <span id="completedCount" class="stats-value">0</span>
+          </div>
+          <div class="stats-item">
+            <span class="stats-label">当前类别</span>
+            <span id="currentCategoryName" class="stats-value">-</span>
+          </div>
+        </div>
+        
+        <div class="completion-buttons">
+          <button class="btn-restart" onclick="restartCategory()">
+            重新开始
+          </button>
+          <button class="btn-continue" onclick="closeCompletionModal()">
+            继续探索
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 简洁返回键 -->
+    <button onclick="goBack()" class="back-button">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+      </svg>
+      返回游戏库
+    </button>
+
+  </body>
+</html>
