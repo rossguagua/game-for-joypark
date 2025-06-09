@@ -468,11 +468,12 @@
     </button>
 
     <script type="module">
-      import { getCardsByCategory } from './src/lib/supabase.ts'
+      import { getGameCardIds, getCardById } from './src/lib/supabase.ts'
 
-      let topicsData = {};
-      let availableCards = {}; // Store available cards for each category
-      let usedCards = {}; // Store used cards for each category
+      // 游戏状态管理
+      let cardIdsByCategory = {}; // 存储每个分类的卡片ID列表
+      let availableCardIds = {}; // 存储每个分类可用的卡片ID
+      let usedCardIds = {}; // 存储每个分类已使用的卡片ID
       let currentCategoryId = 'mildmode';
 
       const topicCardElement = document.getElementById('topic-card');
@@ -523,28 +524,29 @@
         sel.style.left = initialTabPositions[id].left;
       });
 
-      // 从数据库加载话题数据
-      async function loadTopicsData() {
+      // 优化后的数据加载 - 使用方案A（推荐）
+      async function loadGameData() {
         try {
-          console.log('Loading topics data from database...');
+          console.log('Loading game card IDs from database...');
+          const startTime = performance.now();
           
-          // 加载所有分类的卡片
-          for (const categoryId of Object.keys(categoryNames)) {
-            console.log(`Loading cards for category: ${categoryId}`);
-            const cards = await getCardsByCategory('drinking-topics', categoryId);
-            console.log(`Loaded ${cards.length} cards for ${categoryId}:`, cards);
+          // 并行加载所有分类的卡片ID列表
+          const loadPromises = Object.keys(categoryNames).map(async (categoryId) => {
+            console.log(`Loading card IDs for category: ${categoryId}`);
+            const cardIds = await getGameCardIds('drinking-topics', categoryId);
+            console.log(`Loaded ${cardIds.length} card IDs for ${categoryId}`);
             
-            topicsData[categoryId] = {
-              id: categoryId,
-              ...categoryColors[categoryId],
-              questions: cards.map(card => card.content)
-            };
-          }
+            cardIdsByCategory[categoryId] = cardIds;
+            availableCardIds[categoryId] = [...cardIds]; // 创建副本
+            usedCardIds[categoryId] = [];
+            
+            return { categoryId, count: cardIds.length };
+          });
 
-          console.log('All topics data loaded:', topicsData);
+          const results = await Promise.all(loadPromises);
+          const loadTime = performance.now() - startTime;
           
-          // 初始化可用卡片
-          initializeAvailableCards();
+          console.log(`All card IDs loaded in ${loadTime.toFixed(2)}ms:`, results);
           
           // 隐藏加载状态，显示游戏
           document.getElementById('loadingState').style.display = 'none';
@@ -554,76 +556,82 @@
           setActiveCategory(currentCategoryId);
           
         } catch (error) {
-          console.error('Error loading topics data:', error);
+          console.error('Error loading game data:', error);
           document.getElementById('loadingState').style.display = 'none';
           document.getElementById('errorState').style.display = 'block';
         }
       }
 
-      function initializeAvailableCards() {
-        for (const categoryId in topicsData) {
-          if (topicsData[categoryId] && topicsData[categoryId].questions) {
-            // Create a copy of all questions for this category
-            availableCards[categoryId] = [...topicsData[categoryId].questions];
-            usedCards[categoryId] = [];
-          }
-        }
-      }
-
       function resetCategoryCards(categoryId) {
-        if (topicsData[categoryId] && topicsData[categoryId].questions) {
-          availableCards[categoryId] = [...topicsData[categoryId].questions];
-          usedCards[categoryId] = [];
+        if (cardIdsByCategory[categoryId]) {
+          availableCardIds[categoryId] = [...cardIdsByCategory[categoryId]];
+          usedCardIds[categoryId] = [];
         }
       }
 
-      function getRandomTopicFromAvailable(categoryId) {
-        if (!availableCards[categoryId] || availableCards[categoryId].length === 0) {
-          return null; // No more cards available
+      // 优化后的卡片获取 - 按需加载单张卡片
+      async function getNextCard(categoryId) {
+        if (!availableCardIds[categoryId] || availableCardIds[categoryId].length === 0) {
+          return null; // 没有更多卡片
         }
 
-        // Get random index from available cards
-        const randomIndex = Math.floor(Math.random() * availableCards[categoryId].length);
-        const selectedTopic = availableCards[categoryId][randomIndex];
+        // 从可用卡片中随机选择一个ID
+        const randomIndex = Math.floor(Math.random() * availableCardIds[categoryId].length);
+        const selectedCardId = availableCardIds[categoryId][randomIndex];
         
-        // Move the card from available to used
-        availableCards[categoryId].splice(randomIndex, 1);
-        usedCards[categoryId].push(selectedTopic);
+        // 从可用列表中移除，添加到已使用列表
+        availableCardIds[categoryId].splice(randomIndex, 1);
+        usedCardIds[categoryId].push(selectedCardId);
         
-        return selectedTopic;
+        try {
+          // 按需获取单张卡片内容
+          const card = await getCardById(selectedCardId);
+          return card;
+        } catch (error) {
+          console.error('Error fetching card by ID:', error);
+          return null;
+        }
       }
 
       function updateProgressIndicator() {
-        if (!topicsData[currentCategoryId]) return;
+        if (!cardIdsByCategory[currentCategoryId]) return;
         
-        const totalCards = topicsData[currentCategoryId].questions.length;
-        const usedCount = usedCards[currentCategoryId] ? usedCards[currentCategoryId].length : 0;
+        const totalCards = cardIdsByCategory[currentCategoryId].length;
+        const usedCount = usedCardIds[currentCategoryId] ? usedCardIds[currentCategoryId].length : 0;
         
         progressIndicator.textContent = `${usedCount}/${totalCards}`;
       }
 
-      function displayNewTopic() {
-        if (!topicsData[currentCategoryId]) {
+      async function displayNewTopic() {
+        if (!cardIdsByCategory[currentCategoryId]) {
           topicTextElement.textContent = '话题数据未加载或类型不存在。';
           return;
         }
 
-        const newTopic = getRandomTopicFromAvailable(currentCategoryId);
-        
-        if (newTopic === null) {
-          // All cards have been used, show completion modal
-          showCompletionModal();
-          return;
-        }
-
+        // 显示加载状态
         topicTextElement.classList.remove('topic-fade-in');
         topicTextElement.classList.add('topic-fade-out');
         
-        setTimeout(() => {
-          topicTextElement.textContent = newTopic;
-          topicTextElement.classList.remove('topic-fade-out');
-          topicTextElement.classList.add('topic-fade-in');
-          updateProgressIndicator();
+        setTimeout(async () => {
+          try {
+            const card = await getNextCard(currentCategoryId);
+            
+            if (card === null) {
+              // 所有卡片都已使用，显示完成模态框
+              showCompletionModal();
+              return;
+            }
+
+            topicTextElement.textContent = card.content;
+            topicTextElement.classList.remove('topic-fade-out');
+            topicTextElement.classList.add('topic-fade-in');
+            updateProgressIndicator();
+          } catch (error) {
+            console.error('Error displaying new topic:', error);
+            topicTextElement.textContent = '加载话题失败，请重试';
+            topicTextElement.classList.remove('topic-fade-out');
+            topicTextElement.classList.add('topic-fade-in');
+          }
         }, 300);
       }
 
@@ -632,7 +640,7 @@
         const completedCount = document.getElementById('completedCount');
         const currentCategoryName = document.getElementById('currentCategoryName');
         
-        completedCount.textContent = topicsData[currentCategoryId].questions.length;
+        completedCount.textContent = cardIdsByCategory[currentCategoryId].length;
         currentCategoryName.textContent = categoryNames[currentCategoryId];
         
         modal.classList.add('active');
@@ -650,7 +658,7 @@
         updateProgressIndicator();
         closeCompletionModal();
         
-        // Show a fresh start message
+        // 显示重新开始消息
         topicTextElement.classList.remove('topic-fade-in');
         topicTextElement.classList.add('topic-fade-out');
         
@@ -662,16 +670,16 @@
       }
 
       function updateTopicCardUnifiedStyle() {
-        if (!topicsData[currentCategoryId]) {
+        if (!categoryColors[currentCategoryId]) {
           console.warn('Current category data is not available.');
           return;
         }
-        const activeCategoryData = topicsData[currentCategoryId];
-        for (const key in topicsData) {
-          if (topicsData.hasOwnProperty(key)) {
+        const activeCategoryData = categoryColors[currentCategoryId];
+        for (const key in categoryColors) {
+          if (categoryColors.hasOwnProperty(key)) {
             topicCardElement.classList.remove(
-              topicsData[key].mainCardColor,
-              topicsData[key].mainCardTextColor
+              categoryColors[key].mainCardColor,
+              categoryColors[key].mainCardTextColor
             );
           }
         }
@@ -686,7 +694,7 @@
         updateTopicCardUnifiedStyle();
         updateProgressIndicator();
         
-        // Show initial message for new category
+        // 显示新分类的初始消息
         topicTextElement.classList.remove('topic-fade-in');
         topicTextElement.classList.add('topic-fade-out');
         
@@ -751,14 +759,14 @@
         });
       });
 
-      // Close completion modal when clicking outside
+      // 关闭完成模态框的事件监听
       document.getElementById('completionModal').addEventListener('click', function(e) {
         if (e.target === this) {
           closeCompletionModal();
         }
       });
 
-      // Close completion modal with Escape key
+      // ESC键关闭完成模态框
       document.addEventListener('keydown', function(e) {
         if (e.key === 'Escape') {
           closeCompletionModal();
@@ -766,7 +774,7 @@
       });
 
       // 初始化应用
-      loadTopicsData();
+      loadGameData();
     </script>
   </body>
 </html>
